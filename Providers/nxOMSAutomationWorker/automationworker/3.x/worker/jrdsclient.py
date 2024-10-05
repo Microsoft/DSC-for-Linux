@@ -8,6 +8,7 @@
 from datetime import datetime
 import time
 import traceback
+import urllib.parse
 
 
 import configuration3 as configuration
@@ -69,8 +70,9 @@ class JRDSClient(object):
                 }
             ]
         """
+        encoded_hybrid_worker_group_name = urllib.parse.quote(self.HybridWorkerGroupName)
         url = self.base_uri + "/automationAccounts/" + self.account_id + \
-              "/Sandboxes/GetSandboxActions?HybridWorkerGroupName=" + self.HybridWorkerGroupName + \
+              "/Sandboxes/GetSandboxActions?HybridWorkerGroupName=" + encoded_hybrid_worker_group_name + \
               "&api-version=" + self.protocol_version
         response = self.issue_request(lambda u: self.httpClient.get(u), url)
 

@@ -1,5 +1,5 @@
 language: c
-dist: trusty   # Travis build machine is Ubuntu Trusty 14.04 x64
+dist: xenial   # Travis build machine is Ubuntu Trusty 14.04 x64
 sudo: required # A sudo enabled, full VM is used for building instead of a docker container
 services:
   - docker
@@ -79,7 +79,7 @@ script:
   - make &> /dev/null
   - sudo make altinstall &> /dev/null
   - cd ..
-  - wget -q --no-check-certificate https://sourceforge.net/projects/ctypes/files/ctypes/1.0.2/ctypes-1.0.2.tar.gz
+  - wget -q https://sourceforge.net/projects/ctypes/files/ctypes/1.0.2/ctypes-1.0.2.tar.gz
   - tar -xzf ctypes-1.0.2.tar.gz
   - cd ctypes-1.0.2
   - sudo python2.4 ./setup.py build install &> /dev/null

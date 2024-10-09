@@ -156,10 +156,6 @@ def get_value(key):
         raise KeyError("Configuration environment variable not found. [key=" + key + "].")
 
 
-def get_jrds_get_sandbox_actions_polling_freq():
-    return get_value(JRDS_POLLING_FREQUENCY)
-
-
 def get_jrds_get_job_actions_polling_freq():
     return get_value(JRDS_POLLING_FREQUENCY)
 

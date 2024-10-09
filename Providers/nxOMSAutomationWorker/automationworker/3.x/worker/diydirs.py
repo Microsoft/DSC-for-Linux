@@ -6,7 +6,7 @@
 """Utility for DIY hybrid worker directories"""
 
 
-from worker import linuxutil
+import linuxutil
 import os
 
 NXAUTOMATION_HOME_DIR = "/home/nxautomation"

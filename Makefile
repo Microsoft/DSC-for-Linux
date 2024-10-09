@@ -61,6 +61,12 @@ else
 	$(MAKE) dsc110
 	$(MAKE) dsckit110
  endif
+ ifeq ($(BUILD_SSL_300),1)
+	rm -rf omi-1.0.8/output_openssl_3.0.0/lib/libdsccore.so
+	$(MAKE) omi300
+	$(MAKE) dsc300
+	$(MAKE) dsckit300
+ endif
 
 endif
 
@@ -94,6 +100,16 @@ endif
 
 	-mkdir -p release; \
 	cp omi-1.0.8/output_openssl_1.1.0/release/*.{rpm,deb} output/release/*.{rpm,deb} release/
+
+ifeq ($(BUILD_OMS),BUILD_OMS)
+dsckit300: nx nxOMSPerfCounter nxOMSSyslog nxOMSKeyMgmt nxOMSPlugin nxOMSCustomLog nxOMSSudoCustomLog nxFileInventory nxOMSGenerateInventoryMof nxOMSAgentNPMConfig nxOMSAutomationWorker nxOMSAuditdPlugin
+else
+dsckit300: nx nxNetworking nxComputerManagement nxMySQL
+endif
+	$(MAKE) -C $(INSTALLBUILDER_DIR) SSL_VERSION=300 BUILD_RPM=$(BUILD_RPM) BUILD_DPKG=$(BUILD_DPKG) BUILD_OMS_VAL=$(BUILD_OMS_VAL)
+
+	-mkdir -p release; \
+	cp omi-1.0.8/output_openssl_3.0.0/release/*.{rpm,deb} output/release/*.{rpm,deb} release/
 
 dsc098: lcm098 providers
 	mkdir -p intermediate/Scripts
@@ -226,6 +242,49 @@ dsc110: lcm110 providers
 	done
 	if [ -f ../dsc.version ]; then cp -f ../dsc.version build/dsc.version; else cp -f build/Makefile.version build/dsc.version; fi
 
+dsc300: lcm300 providers
+	mkdir -p intermediate/Scripts
+	mkdir -p intermediate/Scripts/python3
+	mkdir -p intermediate/Modules
+	.  omi-1.0.8/output_openssl_3.0.0/config.mak; \
+	for f in LCM/scripts/*.py LCM/scripts/*.sh Providers/Scripts/*.py Providers/Scripts/*.sh; do \
+	  cat $$f | \
+	  sed "s@<CONFIG_BINDIR>@$$CONFIG_BINDIR@" | \
+	  sed "s@<CONFIG_LIBDIR>@$$CONFIG_LIBDIR@" | \
+	  sed "s@<CONFIG_LOCALSTATEDIR>@$$CONFIG_LOCALSTATEDIR@" | \
+	  sed "s@<CONFIG_SYSCONFDIR>@$$CONFIG_SYSCONFDIR@" | \
+	  sed "s@<CONFIG_SYSCONFDIR_DSC>@$(CONFIG_SYSCONFDIR_DSC)@" | \
+	  sed "s@<OAAS_CERTPATH>@$(OAAS_CERTPATH)@" | \
+	  sed "s@<OAAS_KEYPATH>@$(OAAS_KEYPATH)@" | \
+	  sed "s@<OAAS_THUMBPRINT>@$(OAAS_THUMBPRINT)@" | \
+	  sed "s@<OMI_LIB_SCRIPTS>@$$CONFIG_LIBDIR/Scripts@" | \
+	  sed "s@<PYTHON_PID_DIR>@$(PYTHON_PID_DIR)@" | \
+	  sed "s@<DSC_NAMESPACE>@$(DSC_NAMESPACE)@" | \
+	  sed "s@<DSC_SCRIPT_PATH>@$(DSC_SCRIPT_PATH)@" | \
+	  sed "s@<DSC_HOST_BASE_PATH>@$(DSC_HOST_BASE_PATH)@" | \
+	  sed "s@<DSC_MODULES_PATH>@$(DSC_MODULES_PATH)@" > intermediate/Scripts/`basename $$f`; \
+	  chmod a+x intermediate/Scripts/`basename $$f`; \
+	done
+
+	for f in LCM/scripts/python3/*.py LCM/scripts/python3/*.sh; do \
+	  cat $$f | \
+	  sed "s@<CONFIG_BINDIR>@$$CONFIG_BINDIR@" | \
+	  sed "s@<CONFIG_LIBDIR>@$$CONFIG_LIBDIR@" | \
+	  sed "s@<CONFIG_LOCALSTATEDIR>@$$CONFIG_LOCALSTATEDIR@" | \
+	  sed "s@<CONFIG_SYSCONFDIR>@$$CONFIG_SYSCONFDIR@" | \
+	  sed "s@<CONFIG_SYSCONFDIR_DSC>@$(CONFIG_SYSCONFDIR_DSC)@" | \
+	  sed "s@<OAAS_CERTPATH>@$(OAAS_CERTPATH)@" | \
+	  sed "s@<OAAS_KEYPATH>@$(OAAS_KEYPATH)@" | \
+	  sed "s@<OAAS_THUMBPRINT>@$(OAAS_THUMBPRINT)@" | \
+	  sed "s@<OMI_LIB_SCRIPTS>@$$CONFIG_LIBDIR/Scripts@" | \
+	  sed "s@<PYTHON_PID_DIR>@$(PYTHON_PID_DIR)@" | \
+	  sed "s@<DSC_NAMESPACE>@$(DSC_NAMESPACE)@" | \
+	  sed "s@<DSC_SCRIPT_PATH>@$(DSC_SCRIPT_PATH)@" | \
+	  sed "s@<DSC_HOST_BASE_PATH>@$(DSC_HOST_BASE_PATH)@" | \
+	  sed "s@<DSC_MODULES_PATH>@$(DSC_MODULES_PATH)@" > intermediate/Scripts/python3/`basename $$f`; \
+	  chmod a+x intermediate/Scripts/python3/`basename $$f`; \
+	done
+	if [ -f ../dsc.version ]; then cp -f ../dsc.version build/dsc.version; else cp -f build/Makefile.version build/dsc.version; fi
 
 omi098:
 	$(MAKE) configureomi098
@@ -248,6 +307,13 @@ omi110:
 	$(MAKE) -C omi-1.0.8
 	$(MAKE) -C omi-1.0.8/installbuilder SSL_VERSION=110 BUILD_RPM=$(BUILD_RPM) BUILD_DPKG=$(BUILD_DPKG) SSL_BUILD=1.1.0
 
+omi300:
+	$(MAKE) configureomi300
+	rm -rf omi-1.0.8/output
+	ln -s output_openssl_3.0.0 omi-1.0.8/output
+	$(MAKE) -C omi-1.0.8
+	$(MAKE) -C omi-1.0.8/installbuilder SSL_VERSION=300 BUILD_RPM=$(BUILD_RPM) BUILD_DPKG=$(BUILD_DPKG) SSL_BUILD=3.0.0
+
 configureomi098:
 	(cd omi-1.0.8; ./configure $(DEBUG_FLAGS) --enable-preexec --prefix=/opt/omi --outputdirname=output_openssl_0.9.8 --localstatedir=/var/opt/omi --sysconfdir=/etc/opt/omi/conf --certsdir=/etc/opt/omi/ssl --opensslcflags="$(openssl098_cflags)" --openssllibs="-L$(current_dir)/ext/curl/current_platform/lib $(openssl098_libs)" --openssllibdir="$(openssl098_libdir)")
 
@@ -256,6 +322,9 @@ configureomi100:
 
 configureomi110:
 	(cd omi-1.0.8; ./configure $(DEBUG_FLAGS) --enable-preexec --prefix=/opt/omi --outputdirname=output_openssl_1.1.0 --localstatedir=/var/opt/omi --sysconfdir=/etc/opt/omi/conf --certsdir=/etc/opt/omi/ssl --opensslcflags="$(openssl110_cflags)" --openssllibs="-L$(current_dir)/ext/curl/current_platform/lib $(openssl110_libs)" --openssllibdir="$(openssl110_libdir)")
+
+configureomi300:
+	(cd omi-1.0.8; ./configure $(DEBUG_FLAGS) --enable-preexec --prefix=/opt/omi --outputdirname=output_openssl_3.0.0 --localstatedir=/var/opt/omi --sysconfdir=/etc/opt/omi/conf --certsdir=/etc/opt/omi/ssl --opensslcflags="$(openssl300_cflags)" --openssllibs="-L$(current_dir)/ext/curl/current_platform/lib $(openssl300_libs)" --openssllibdir="$(openssl300_libdir)")
 
 lcm098:
 	$(MAKE) -C LCM
@@ -266,13 +335,16 @@ lcm100:
 lcm110:
 	$(MAKE) -C LCM
 
+lcm300:
+	$(MAKE) -C LCM
+
 providers:
 	$(MAKE) -C Providers
 
 ifeq ($(BUILD_OMS),BUILD_OMS)
 nx:
 	rm -rf output/staging; \
-	VERSION="1.1"; \
+	VERSION="1.5"; \
 	PROVIDERS="nxService nxPackage nxUser nxGroup nxAvailableUpdates"; \
 	STAGINGDIR="output/staging/$@/DSCResources"; \
 	cat Providers/Modules/$@.psd1 | sed "s@<MODULE_VERSION>@$${VERSION}@" > intermediate/Modules/$@.psd1; \
@@ -294,7 +366,7 @@ nx:
 else
 nx:
 	rm -rf output/staging; \
-	VERSION="1.1"; \
+	VERSION="1.5"; \
 	PROVIDERS="nxFile nxScript nxUser nxGroup nxService nxPackage nxEnvironment nxSshAuthorizedKeys nxArchive nxFileLine"; \
 	STAGINGDIR="output/staging/$@/DSCResources"; \
 	cat Providers/Modules/$@.psd1 | sed "s@<MODULE_VERSION>@$${VERSION}@" > intermediate/Modules/$@.psd1; \
@@ -316,7 +388,7 @@ endif
 
 nxOMSAutomationWorker:
 	rm -rf output/staging; \
-	VERSION="1.7.5.0"; \
+	VERSION="1.10.0.0"; \
 	PROVIDERS="nxOMSAutomationWorker"; \
 	STAGINGDIR="output/staging/$@/DSCResources"; \
 	cat Providers/Modules/$@.psd1 | sed "s@<MODULE_VERSION>@$${VERSION}@" > intermediate/Modules/$@.psd1; \
@@ -495,7 +567,7 @@ nxOMSCustomLog:
 
 nxOMSSudoCustomLog:
 	rm -rf output/staging; \
-	VERSION="2.7"; \
+	VERSION="2.8"; \
 	PROVIDERS="nxOMSSudoCustomLog"; \
 	STAGINGDIR="output/staging/$@/DSCResources"; \
 	cat Providers/Modules/$@.psd1 | sed "s@<MODULE_VERSION>@$${VERSION}@" > intermediate/Modules/$@.psd1; \
@@ -541,7 +613,7 @@ nxOMSGenerateInventoryMof:
 
 nxOMSPlugin:
 	rm -rf output/staging; \
-	VERSION="3.62"; \
+	VERSION="3.74"; \
 	PROVIDERS="nxOMSPlugin"; \
 	STAGINGDIR="output/staging/$@/DSCResources"; \
 	cat Providers/Modules/$@.psd1 | sed "s@<MODULE_VERSION>@$${VERSION}@" > intermediate/Modules/$@.psd1; \
@@ -588,7 +660,7 @@ nxFileInventory:
 
 nxOMSAgentNPMConfig:
 	rm -rf output/staging; \
-	VERSION="4.3"; \
+	VERSION="4.6"; \
 	PROVIDERS="nxOMSAgentNPMConfig"; \
 	STAGINGDIR="output/staging/$@/DSCResources"; \
 	cat Providers/Modules/$@.psd1 | sed "s@<MODULE_VERSION>@$${VERSION}@" > intermediate/Modules/$@.psd1; \
@@ -684,6 +756,7 @@ distclean: clean
 	rm -rf omi-1.0.8/output_openssl_0.9.8
 	rm -rf omi-1.0.8/output_openssl_1.0.0
 	rm -rf omi-1.0.8/output_openssl_1.1.0
+	rm -rf omi-1.0.8/output_openssl_3.0.0
 
 clean:
 ifeq ($(BUILD_LOCAL),1)

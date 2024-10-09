@@ -66,6 +66,6 @@ def pattern(pattern, flags=FLAGS):
         return fn
     return decorator
 
-def InsignificantWhitespace(match, context):
+def insignificantWhitespace(match, context):
     return None, None
-pattern(r'\s+')(InsignificantWhitespace)
+pattern(r'\s+')(insignificantWhitespace)

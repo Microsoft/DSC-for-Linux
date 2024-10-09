@@ -12,6 +12,7 @@ import copy
 import fnmatch
 import time
 import os
+import uuid
 
 protocol = imp.load_source('protocol', '../protocol.py')
 nxDSCLog = imp.load_source('nxDSCLog', '../nxDSCLog.py')
@@ -37,6 +38,7 @@ def Inventory_Marshall(Name):
         p['BuildDate'] = protocol.MI_String(p['BuildDate'])
         p['Repository'] = protocol.MI_String(p['Repository'])
         p['Version'] = protocol.MI_String(p['Version'])
+        p['Classification'] = protocol.MI_String(p['Classification'])
         p['Architecture'] = protocol.MI_String(p['Architecture'])
     Inventory = protocol.MI_InstanceA(pkgs)
     retd = {}
@@ -68,32 +70,71 @@ def GetAptUpdates(Name):
 
     updates_list = []
     d = {}
+    g_guid = str(uuid.uuid4())
+    privileged_path = "/tmp/"
+
+    #Collect Security updates
+    security_sources_list = os.path.join(privileged_path, 'msft-v1-assess-security-{0}.list'.format(g_guid))
+    prep_security_sources_list_cmd = 'grep security /etc/apt/sources.list > ' + security_sources_list
+
+    #to remove all files, following this pattern
+    remove_security_sources_list_cmd = 'rm ' + os.path.join(privileged_path, 'msft-v1-assess-security-*.list')
+    dist_upgrade_simulation_cmd_template = 'LANG=en_US.UTF8 apt-get -s dist-upgrade <SOURCES> '
     # Refresh the repo
     if helperlib.CONFIG_SYSCONFDIR_DSC == "omsconfig":
         cmd = 'sudo /opt/microsoft/omsconfig/Scripts/OMSAptUpdates.sh'
     else:
         cmd = 'apt-get -q update'
     code, out = RunGetOutput(cmd, False, False)
-    cmd = 'LANG=en_US.UTF8 apt-get -s dist-upgrade | grep "^Inst"'
-    LG().Log('DEBUG', "Retrieving update package list using cmd:" + cmd)
-    code, out = RunGetOutput(cmd, False, False)
-    if len(out) < 2:
-        return updates_list
-    srch_txt = r'Inst[ ](.*?)[ ].*?[(](.*?)[ ](.*?)[ ]\[(.*?)\]'
-    srch = re.compile(srch_txt, re.M | re.S)
-    pkg_list = srch.findall(out)
-    for pkg in pkg_list:
-        d['BuildDate'] = ''
-        d['Name'] = pkg[0]
-        if len(Name) and not fnmatch.fnmatch(d['Name'], Name):
-            continue
-        d['Architecture'] = pkg[3]
-        d['Version'] = pkg[1]
-        d['Repository'] = pkg[2]
-        updates_list.append(copy.deepcopy(d))
-    LG().Log('DEBUG', "Number of packages being written to the XML: " + str(len(updates_list)))
-    return updates_list
+    #Get Security Patches list
+    security_patch_list = []
 
+    try:
+        code, out = RunGetOutput(prep_security_sources_list_cmd,False,False)
+        if code != 0:
+            LG().Log('ERROR', "Unexpected error in running cmd {0} : {1}".format(prep_security_sources_list_cmd, out))
+            raise Exception("Unexpected error in running cmd {0} : {1}".format(prep_security_sources_list_cmd, out))
+
+        security_updates_cmd = dist_upgrade_simulation_cmd_template.replace('<SOURCES>', '-oDir::Etc::Sourcelist=' + security_sources_list)
+        code,out = RunGetOutput(security_updates_cmd,False,False)
+
+        srch_txt = r'Inst[ ](.*?)[ ].*?[(](.*?)[ ](.*?)[ ]\[(.*?)\]'
+        srch = re.compile(srch_txt, re.M | re.S)
+        pkg_list = srch.findall(str(out))
+        for package in pkg_list:
+            security_patch_list.append(package[0])
+
+        cmd = 'LANG=en_US.UTF8 apt-get -s dist-upgrade | grep "^Inst"'
+        LG().Log('DEBUG', "Retrieving update package list using cmd:" + cmd)
+        code, out = RunGetOutput(cmd, False, False)
+        if len(out) < 2:
+            return updates_list
+
+        srch_txt = r'Inst[ ](.*?)[ ].*?[(](.*?)[ ](.*?)[ ]\[(.*?)\]'
+        srch = re.compile(srch_txt, re.M | re.S)
+        pkg_list = srch.findall(out)
+        for pkg in pkg_list:
+            d['BuildDate'] = ''
+            d['Name'] = pkg[0]
+            if len(Name) and not fnmatch.fnmatch(d['Name'], Name):
+                continue
+            d['Architecture'] = pkg[3]
+            d['Version'] = pkg[1]
+            if d['Name'] in security_patch_list:
+                d['Classification'] = "Security Updates"
+            else:
+                d['Classification'] = "Others"
+            d['Repository'] = pkg[2]
+            updates_list.append(copy.deepcopy(d))
+
+        LG().Log('DEBUG', "Number of packages being written to the XML: " + str(len(updates_list)))
+        return updates_list
+    finally:
+        rmcode, rmout = RunGetOutput(remove_security_sources_list_cmd,False,False)
+        if rmcode != 0:
+            LG().Log('DEBUG', "Not able to delete {0}. Error: {1}".format(security_sources_list, rmout))
+        else:
+            LG().Log('DEBUG', "{0} folder cleared".format(privileged_path))
 
 def GetYumUpdates(Name):
     # Format:
@@ -135,11 +176,11 @@ def GetYumUpdates(Name):
     #LG().Log('DEBUG', "Cmd output for update list : " + pkg_list)    
 
     # Sample output from OMSYumUpdates.sh
-    #   ca-certificates.noarch
-    #   glibc.x86_64
-    #   glibc-common.x86_64
-    #   glibc-devel.x86_64
-    #   glibc-headers.x86_64
+    #   ca-certificates.noarch                                               1:1.1.0-4.el8                                            rhui-rhel-8-for-x86_64-baseos-rhui-rpms
+    #   glibc.x86_64                                                         1:1.23.0-4.el8                                           rhui-rhel-8-for-x86_64-baseos-rhui-rpms
+    #   glibc-common.x86_64                                                  1:1.45.0-4.el8                                           rhui-rhel-8-for-x86_64-baseos-rhui-rpms
+    #   glibc-devel.x86_64                                                   1:1.23.0-4.el8                                           rhui-rhel-8-for-x86_64-baseos-rhui-rpms
+    #   glibc-headers.x86_64                                                 1:1.56.0-4.el8                                           rhui-rhel-8-for-x86_64-baseos-rhui-rpms
     if validate_yum_pkg_list_output(pkg_list, retcode):
         # Remove the chatter.  Yum puts a blank line before the list.
         if pkg_list.find('\n\n') > -1:
@@ -148,11 +189,30 @@ def GetYumUpdates(Name):
         srch = re.compile(srch_str, re.M | re.S)
 
         param_list = ""
+        param_list2 = ""
         for pkg in pkg_list.splitlines():
-            if pkg == "Obsoleting":
+            line = re.split(r'\s+', pkg.strip())
+
+            if len(line) == 0:
+                continue
+            
+            if line[0] == "Obsoleting":
                 LG().Log('DEBUG', "List including obsolete packages: " + str(pkg_list))
                 break
-            param_list = param_list + " " + pkg
+
+            if len(line) == 3 and is_yum_package(line[0]):
+                pkg_and_arch = str(line[0]).split(".")
+                pkg_name = pkg_and_arch[0]
+                pkg_arch = pkg_and_arch[1]
+                pkg_version = line[1]
+
+                param_list = param_list + " " + str(pkg_name) + "-" + str(pkg_version) + "." + str(pkg_arch)
+            else:
+                LG().Log('DEBUG', "Package not in correct format: " + str(pkg.strip()))
+                param_list2 = param_list2 + " " + line[0]
+
+        if len(param_list) == 0 and len(param_list2) > 0:
+            LG().Log('DEBUG', "No valid packages found. Falling back to package_info based on the package name.")
 
         cmd = "LANG=en_US.UTF8 " + yum_info + param_list
         LG().Log('DEBUG', "Retrieving individual package information from Yum using cmd: " + cmd)
@@ -165,12 +225,71 @@ def GetYumUpdates(Name):
             LG().Log('DEBUG', "Failed retrieving individual package info. Output is too small : " + out)
             return updates_list
         yum_pkg_info_list = srch.finditer(out)
-        updates_list = get_yum_updates_list(yum_pkg_info_list, Name)
+        security_patches = get_yum_security_updates()
+        updates_list = get_yum_updates_list(yum_pkg_info_list,security_patches, Name)
     LG().Log('DEBUG', "Number of packages being written to the XML: " + str(len(updates_list)))
     return updates_list
 
+def get_product_name(package_name):
+        """Splits out product name and architecture - if this is changed, modify in PackageFilter also"""
+        return package_name
 
-def get_yum_updates_list(yum_pkg_info_list, Name):
+def is_yum_package(chunk):
+    package_extensions = ['.x86_64', '.noarch', '.i686']
+
+    # Using a list comprehension to determine if chunk is a package
+    return len([p for p in package_extensions if p in chunk]) == 1
+
+def get_yum_security_updates():
+    d = {}
+    if helperlib.CONFIG_SYSCONFDIR_DSC == "omsconfig":
+        yum_check_security = 'sudo /opt/microsoft/omsconfig/Scripts/OMSYumSecurityUpdates.sh '
+    else:
+        yum_check_security = 'yum -q --security check-update '
+        install_yum_security_prerequisite()
+    code, out = RunGetOutput(yum_check_security,False,False)
+    security_packages, security_package_versions = extract_packages_and_versions_including_duplicates(out)
+    return security_packages
+
+def install_yum_security_prerequisite():
+    yum_check_security_prerequisite = 'sudo yum -y install yum-plugin-security'
+    code, out = RunGetOutput(yum_check_security_prerequisite, False, False)
+
+def extract_packages_and_versions_including_duplicates(output):
+        """Returns packages and versions from given output"""
+        packages = []
+        versions = []
+
+        lines = output.strip().split('\n')
+
+        for line_index in range(0, len(lines)):
+            line = re.split(r'\s+', lines[line_index].strip())
+            next_line = []
+
+            if line_index < len(lines) - 1:
+                next_line = re.split(r'\s+', lines[line_index + 1].strip())
+
+            # If we run into a length of 3, we'll accept it and continue
+            if len(line) == 3 and is_yum_package(line[0]):
+                packages.append(get_product_name(line[0]))
+                versions.append(line[1])
+            # We will handle these two edge cases where the output is on
+            # two different lines and treat them as one line
+            elif len(line) == 1 and len(next_line) == 2 and is_yum_package(line[0]):
+                packages.append(get_product_name(line[0]))
+                versions.append(next_line[0])
+                line_index += 1
+            elif len(line) == 2 and len(next_line) == 1 and is_yum_package(line[0]):
+                packages.append(get_product_name(line[0]))
+                versions.append(line[1])
+                line_index += 1
+            else:
+                print("Inapplicable line")
+                #self.composite_logger.log_debug(" - Inapplicable line (" + str(line_index) + "): " + lines[line_index])
+
+        return packages, versions
+
+def get_yum_updates_list(yum_pkg_info_list, security_updates, Name):
     d = {}
     updates_list = []
     for yum_pkg_info in yum_pkg_info_list:
@@ -182,6 +301,10 @@ def get_yum_updates_list(yum_pkg_info_list, Name):
         if ':' not in d['Version']:  # Add a '0:' for epoch.
             d['Version'] = '0:' + d['Version']
         d['Version'] = d['Version'].replace('(none)', '0')  # Handle the Epoch '(none)'.
+        if str(d['Name']).strip() + "." + str(d['Architecture']).strip() in security_updates:
+           d['Classification'] = "Security Updates"
+        else:
+           d['Classification'] = "Others"
         d['Repository'] = yum_pkg_info.group(5)
         d['BuildDate'] = ''
         updates_list.append(copy.deepcopy(d))
@@ -224,8 +347,10 @@ def GetZypperUpdates(Name):
     # For omsagent the repo is refreshed in OMSZypperUpdates.sh.
     if helperlib.CONFIG_SYSCONFDIR_DSC == "omsconfig":
         zypper = 'sudo /opt/microsoft/omsconfig/Scripts/OMSZypperUpdates.sh'
+        zypper_install_security_patches_simulate = 'sudo /opt/microsoft/omsconfig/Scripts/OMSZypperSecurityUpdates.sh'                      
     else:
         zypper = 'zypper -q lu'
+        zypper_install_security_patches_simulate = 'zypper --non-interactive patch --category security --dry-run'        
         # Refresh the repo.
         cmd = 'zypper -qn refresh'
         LG().Log('DEBUG', "Executing cmd: " + cmd)
@@ -234,6 +359,9 @@ def GetZypperUpdates(Name):
     LG().Log('DEBUG', "Retrieving update package list using cmd:" + cmd)
     code, out = RunGetOutput(cmd, False, False)
     pkg_list = out
+    # Get all security packages
+    code,out = RunGetOutput(zypper_install_security_patches_simulate,False,False)
+    packages_from_patch_data = extract_packages_from_patch_data(out)
     if len(pkg_list) < 2:
         return updates_list
     for pkg in pkg_list.splitlines():
@@ -243,13 +371,40 @@ def GetZypperUpdates(Name):
         if len(Name) and not fnmatch.fnmatch(d['Name'], Name):
             continue
         d['Architecture'] = pkg[5].strip()
+        if d['Name'] in packages_from_patch_data:
+           d['Classification'] = "Security Updates"
+        else:
+           d['Classification'] = "Others"
         d['Version'] = "0:" + pkg[4].strip()
         d['Repository'] = pkg[1].strip()
         updates_list.append(copy.deepcopy(d))
     LG().Log('DEBUG', "Number of packages being written to the XML: " + str(len(updates_list)))
     return updates_list
 
+def extract_packages_from_patch_data(output):
+        """Returns packages (sometimes with version information embedded) from patch data"""
+        packages = []
+        parser_seeing_packages_flag = False
 
+        lines = output.strip().split('\n')
+        for line in lines:
+            if not parser_seeing_packages_flag:
+                if 'package is going to be installed' in line or 'package is going to be upgraded' in line or \
+                        'packages are going to be installed:' in line or 'packages are going to be upgraded:' in line:
+                    parser_seeing_packages_flag = True  # Start -- Next line contains information we need
+                else:
+                    print(" - Inapplicable line: " + line)
+                continue
+
+            if not line or line.isspace():
+                parser_seeing_packages_flag = False
+                continue  # End -- We're past a package information block
+
+            line_parts = line.strip().split(' ')
+            for line_part in line_parts:
+                packages.append(line_part)
+
+        return packages
         
 def RunGetOutput(cmd, no_output, chk_err=True):
     """
@@ -333,4 +488,4 @@ def GetPackageManager():
             if ret == 'apt-get':
                 ret = 'apt'
             break
-    return ret
+    return ret                       

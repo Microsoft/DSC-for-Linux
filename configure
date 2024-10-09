@@ -5,6 +5,7 @@ BUILD_DPKG=1
 BUILD_SSL_098=1
 BUILD_SSL_100=1
 BUILD_SSL_110=1
+BUILD_SSL_300=1
 BUILD_SSL_SYSTEM=0
 BUILD_DEBUG=0
 BUILD_OMS=
@@ -59,6 +60,9 @@ do
 	--no-ssl-110)
 	    BUILD_SSL_110=0
 	    ;;
+    --no-ssl-300)
+	    BUILD_SSL_300=0
+	    ;;
 	--oms)
 	    if [ "$BUILD_LOCAL" = "1" ]; then
 		echo "Error: options --oms and --local conflict."
@@ -100,6 +104,7 @@ OPTIONS:
     --no-ssl-098                Do not build for OpenSSL 0.9.8x
     --no-ssl-100                Do not build for OpenSSL 1.0.x
 	--no-ssl-110                Do not build for OpenSSL 1.1.x
+    --no-ssl-300                Do not build for OpenSSL 3.0.x
 
     --local                     Build without packages and for the OpenSSL installed to the system.
 EOF
@@ -109,7 +114,7 @@ fi
 
 pkgconfig=`which pkg-config`
 
-if [ -d "/usr/local_ssl_0.9.8" ] || [ -d "/usr/local_ssl_1.0.0" ] || [ -d "/usr/local_ssl_1.1.0" ]; then
+if [ -d "/usr/local_ssl_0.9.8" ] || [ -d "/usr/local_ssl_1.0.0" ] || [ -d "/usr/local_ssl_1.1.0" ] || [ -d "/usr/local_ssl_3.0.0" ]; then
     if [ -d "/usr/local_ssl_0.9.8" ]; then
         if [ "`uname -m`" == "x86_64" ]; then
             openssl098_libdir=/usr/local_ssl_0.9.8/lib
@@ -144,6 +149,16 @@ if [ -d "/usr/local_ssl_0.9.8" ] || [ -d "/usr/local_ssl_1.0.0" ] || [ -d "/usr/
         echo -e "\e[33mYellow SSL version 1.1.0 is not found at path /usr/local_ssl_1.1.0. Skipping build for SSL 1.1.0.\e[0m"
         BUILD_SSL_110=0
     fi
+    if [ -d "/usr/local_ssl_3.0.0" ]; then
+        if [ "`uname -m`" == "x86_64" ]; then
+            openssl300_libdir=/usr/local_ssl_3.0.0/lib64
+        fi
+        openssl300_cflags=`PKG_CONFIG_PATH=$openssl300_libdir/pkgconfig $pkgconfig --cflags openssl`
+        openssl300_libs=`PKG_CONFIG_PATH=$openssl300_libdir/pkgconfig $pkgconfig --libs openssl`
+    else
+        echo -e "\e[33mYellow SSL version 3.0.0 is not found at path /usr/local_ssl_3.0.0. Skipping build for SSL 3.0.0.\e[0m"
+        BUILD_SSL_300=0
+    fi
 fi
 
 cat <<EOF > config.mak
@@ -152,6 +167,7 @@ BUILD_DPKG=$BUILD_DPKG
 BUILD_SSL_098=$BUILD_SSL_098
 BUILD_SSL_100=$BUILD_SSL_100
 BUILD_SSL_110=$BUILD_SSL_110
+BUILD_SSL_300=$BUILD_SSL_300
 BUILD_LOCAL=$BUILD_LOCAL
 BUILD_OMS=$BUILD_OMS
 DSC_MODULES_PATH=$DSC_MODULES_PATH
@@ -172,6 +188,9 @@ openssl100_libdir=$openssl100_libdir
 openssl110_cflags=$openssl110_cflags
 openssl110_libs=$openssl110_libs
 openssl110_libdir=$openssl110_libdir
+openssl300_cflags=$openssl300_cflags
+openssl300_libs=$openssl300_libs
+openssl300_libdir=$openssl300_libdir
 
 EOF
 

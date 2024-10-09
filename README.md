@@ -18,14 +18,25 @@ The latest release packages for PowerShell DSC for Linux can be downloaded here:
 [Releases](https://github.com/Microsoft/PowerShell-DSC-for-Linux/releases)
 
 ## Current status and roadmap for Linux DSC
-This repo is the home for the source code and development
-of Desired State Configuration for Linux.
-There are three solutions where releases from this repo
-are expected to be consumed:
+DSC has shifted to a cross-platform implementation that is developed in the
+[PSDesiredStateConfiguration](https://github.com/powershell/psdesiredstateconfiguration)
+repo. Unless you have specific needs that require version 1, please navigate to the new location to view the current work on version 3.
+
+For more information, please see the
+[doumentation for Desired State Configuration](https://learn.microsoft.com/powershell/dsc/overview?view=dsc-3.0).
+
+**This repo has been archived and will no longer accept new issues or pull requests.**
+
+Three solutions were originally released from this repo:
  
-- As a stand-alone installation on support Linux distros and versions
-- Within Microsoft Azure using the Linux DSC extension for virtual machines
-- Within Microsoft Azure as a component of Microsoft Monitoring Agent solutions on Linux virtual machines (aka OMS Linux)
+- A stand-alone installation of version 1 for Linux distros and versions
+  - UPDATE: The updated DSC resources for Linux are now maintained as the [nxTools module](https://www.powershellgallery.com/packages/nxtools/).
+- Microsoft Azure Linux DSC extension for virtual machines
+  - UPDATE: [Desired state configuration VM Extension for Linux, and Azure Automation DSC support for Linux, will be retired on 30 September 2023](https://azure.microsoft.com/updates/migrate-from-linux-dsc-extension-to-the-guest-configuration-feature-of-azure-policy-by-may-1-2025/)
+- Microsoft Monitoring Agent solutions on Linux virtual machines (aka OMS Linux)
+  - UPDATE: [We're retiring the Log Analytics agent in Azure Monitor on 31 August 2024](https://azure.microsoft.com/en-us/updates/were-retiring-the-log-analytics-agent-in-azure-monitor-on-31-august-2024/)
+
+---
  
 The codebase in this repo has been updated with fixes based on customer
 incidents reported for Microsoft Monitoring Agent.
@@ -43,13 +54,6 @@ Please note that
 the extensions for DSC Linux and Monitoring cannot be used
 together on the same machine.
  
-The future roadmap for this solution is to move to
-[Azure Policy Guest Configuration](https://aka.ms/gcpol)
-when it is capable of deploying configurations.
-Currently, Guest Configuration is only able to audit server configurations.
-Many more details including timing and migration
-will be available later in calendar year 2020.
-
 ## Supported Linux operating systems
 The following Linux operating system versions are supported by DSC for Linux. 
 - CentOS 5, 6, and 7 (x86/x64)
@@ -217,7 +221,11 @@ Make sure version 1.1 or later of the DSC Linux agent is installed on the machin
 **To configure Azure Automation as a DSC Pull Server from the Linux computer:**
 
 - On each Linux machine to onboard to Azure Automation DSC, use Register.py to onboard using the PowerShell DSC Local Configuration Manager defaults:  
-```/opt/microsoft/dsc/Scripts/Register.py <Automation account registration key> <Automation account registration URL>  ```
+
+#### For python2
+```sudo /opt/microsoft/dsc/Scripts/Register.py <Automation account registration key> <Automation account registration URL>  ```
+#### For python3
+```sudo /opt/microsoft/dsc/Scripts/python3/Register.py <Automation account registration key> <Automation account registration URL>  ```
 
 - To find the registration key and registration URL for your Automation account, see the Secure Registration section below.
 - Using the Azure portal or cmdlets, check that the machines to onboard now show up as DSC nodes registered in your Azure Automation account. 
@@ -252,8 +260,13 @@ Set-DscLocalConfigurationManager -CimSession $Session –Path C:\Users\joe\Deskt
 ``` 
 - If you cannot apply the PowerShell DSC metaconfigurations remotely, for each Linux machine to onboard, copy the metaconfiguration corresponding to that machine from the folder in step 5 onto the Linux machine. Then call SetDscLocalConfigurationManager.py locally on each Linux machine to onboard to Azure Automation DSC:  
 
+#### For python2
 ```
 /opt/microsoft/dsc/Scripts/SetDscLocalConfigurationManager.py –configurationmof <path to metaconfiguration file> 
+```
+#### For python3
+```
+/opt/microsoft/dsc/Scripts/python3/SetDscLocalConfigurationManager.py –configurationmof <path to metaconfiguration file> 
 ```
 - Using the Azure portal or cmdlets, check that the machines to onboard now show up as DSC nodes registered in your Azure Automation account.  
 
@@ -261,7 +274,7 @@ Set-DscLocalConfigurationManager -CimSession $Session –Path C:\Users\joe\Deskt
 The supplied resource modules with this release (nxNetworking, nxComputerManagement) can be imported to Azure Automation for distribution with DSC configurations. To import to Azure Automation, rename the .zip files to remove the _X.Y version string from the file name. Such as: nxNetworking.zip and nxComputerManagement.zip. 
 
 ## Performing DSC Operations from the Linux Computer 
-DSC for Linux includes scripts to work with configuration from the local Linux computer. These scripts are located in `/opt/microsoft/dsc/Scripts` and include the following:
+DSC for Linux includes scripts to work with configuration from the local Linux computer. These scripts are located in `/opt/microsoft/dsc/Scripts` for python2 and `/opt/microsoft/dsc/Scripts/python3` for python3 and include the following:
 
 **GetDscConfiguration.py**
 Returns the current configuration applied to the computer. Similar to the Windows PowerShell cmdlet Get-DscConfiguration cmdlet. 

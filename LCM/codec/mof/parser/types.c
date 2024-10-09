@@ -42,6 +42,8 @@
     { \
         PTR = ((TYPE##A*)Batch_Get(state->batch, \
             sizeof(TYPE##A) + sizeof(TYPE) * (SIZE))); \
+        if (PTR == NULL) \
+            break; \
         PTR->data = (TYPE*)(PTR + 1); \
         PTR->size = SIZE; \
         break; \
@@ -369,6 +371,8 @@ static int _ValidateYMDU(
         case 11:
             maxday = 30;
             break;
+        default:
+            maxday = 31;
         }
         if (day < 1 || day > maxday)
         {
@@ -657,6 +661,9 @@ static int _PromoteValue(
                 case MI_UINT8:
                 {
                     MI_Uint8* q = MALLOC_T(MI_Uint8, 1);
+                    if(q == NULL) {
+                        return -1;
+                    }
                     MI_Sint64 x = *p;
 
                     if (_CheckRange(state, x, MI_UINT8) != 0)
@@ -669,6 +676,9 @@ static int _PromoteValue(
                 case MI_SINT8:
                 {
                     MI_Sint8* q = MALLOC_T(MI_Sint8, 1);
+                    if(q == NULL) {
+                        return -1;
+                    }
                     MI_Sint64 x = *p;
 
                     if (_CheckRange(state, x, MI_SINT8) != 0)
@@ -681,6 +691,9 @@ static int _PromoteValue(
                 case MI_UINT16:
                 {
                     MI_Uint16* q = MALLOC_T(MI_Uint16, 1);
+                    if(q == NULL) {
+                        return -1;
+                    }
                     MI_Sint64 x = *p;
 
                     if (_CheckRange(state, x, MI_UINT16) != 0)
@@ -693,6 +706,9 @@ static int _PromoteValue(
                 case MI_SINT16:
                 {
                     MI_Sint16* q = MALLOC_T(MI_Sint16, 1);
+                    if(q == NULL) {
+                        return -1;
+                    }
                     MI_Sint64 x = *p;
 
                     if (_CheckRange(state, x, MI_SINT16) != 0)
@@ -705,6 +721,9 @@ static int _PromoteValue(
                 case MI_UINT32:
                 {
                     MI_Uint32* q = MALLOC_T(MI_Uint32, 1);
+                    if(q == NULL) {
+                        return -1;
+                    }
                     MI_Sint64 x = *p;
 
                     if (_CheckRange(state, x, MI_UINT32) != 0)
@@ -717,6 +736,9 @@ static int _PromoteValue(
                 case MI_SINT32:
                 {
                     MI_Sint32* q = MALLOC_T(MI_Sint32, 1);
+                    if(q == NULL) {
+                        return -1;
+                    }
                     MI_Sint64 x = *p;
 
                     if (_CheckRange(state, x, MI_SINT32) != 0)
@@ -729,6 +751,9 @@ static int _PromoteValue(
                 case MI_UINT64:
                 {
                     MI_Uint64* q = MALLOC_T(MI_Uint64, 1);
+                    if(q == NULL) {
+                        return -1;
+                    }
                     MI_Sint64 x = *p;
 
                     if (_CheckRange(state, x, MI_UINT64) != 0)
@@ -757,6 +782,9 @@ static int _PromoteValue(
                 case MI_REAL32:
                 {
                     MI_Real32* q = MALLOC_T(MI_Real32, 1);
+                    if(q == NULL) {
+                        return -1;
+                    }
                     *q = (MI_Real32)*p;
                     *value = q; 
                     return 0;
@@ -791,6 +819,9 @@ static int _PromoteValue(
                     void * pstringvalue = *value;
                     const MI_Char* p = *((const MI_Char**)pstringvalue);
                     MI_Datetime* q = MALLOC_T(MI_Datetime, 1);
+                    if(q == NULL) {
+                        return -1;
+                    }
 
                     if (_StrToDatetime(mofstate, p, q) != 0)
                         return -1;
@@ -821,6 +852,9 @@ static int _PromoteValue(
                 {
                     MI_Uint8A* q;
                     NEW_ARRAY_T(q, MI_Uint8, p->size);
+                    if(q == NULL) {
+                        return -1;
+                    }
 
                     for (i = 0; i < p->size; i++)
                     {
@@ -839,6 +873,9 @@ static int _PromoteValue(
                 {
                     MI_Sint8A* q;
                     NEW_ARRAY_T(q, MI_Sint8, p->size);
+                    if(q == NULL) {
+                        return -1;
+                    }
 
                     for (i = 0; i < p->size; i++)
                     {
@@ -857,6 +894,9 @@ static int _PromoteValue(
                 {
                     MI_Uint16A* q;
                     NEW_ARRAY_T(q, MI_Uint16, p->size);
+                    if(q == NULL) {
+                        return -1;
+                    }
 
                     for (i = 0; i < p->size; i++)
                     {
@@ -875,6 +915,9 @@ static int _PromoteValue(
                 {
                     MI_Sint16A* q;
                     NEW_ARRAY_T(q, MI_Sint16, p->size);
+                    if(q == NULL) {
+                        return -1;
+                    }
 
                     for (i = 0; i < p->size; i++)
                     {
@@ -893,6 +936,9 @@ static int _PromoteValue(
                 {
                     MI_Uint32A* q;
                     NEW_ARRAY_T(q, MI_Uint32, p->size);
+                    if(q == NULL) {
+                        return -1;
+                    }
 
                     for (i = 0; i < p->size; i++)
                     {
@@ -911,6 +957,9 @@ static int _PromoteValue(
                 {
                     MI_Sint32A* q;
                     NEW_ARRAY_T(q, MI_Sint32, p->size);
+                    if(q == NULL) {
+                        return -1;
+                    }
 
                     for (i = 0; i < p->size; i++)
                     {
@@ -929,6 +978,9 @@ static int _PromoteValue(
                 {
                     MI_Uint64A* q;
                     NEW_ARRAY_T(q, MI_Uint64, p->size);
+                    if(q == NULL) {
+                        return -1;
+                    }
 
                     for (i = 0; i < p->size; i++)
                     {
@@ -954,6 +1006,9 @@ static int _PromoteValue(
                     {
                         MI_Uint64A* q;
                         NEW_ARRAY_T(q, MI_Uint64, p->size);
+                        if(q == NULL) {
+                            return -1;
+                        }
                         q->data = NULL;
                         *value = q;
                         return 0;
@@ -976,6 +1031,9 @@ static int _PromoteValue(
                 {
                     MI_Real32A* q;
                     NEW_ARRAY_T(q, MI_Real32, p->size);
+                    if(q == NULL) {
+                        return -1;
+                    }
 
                     for (i = 0; i < p->size; i++)
                     {
@@ -1010,6 +1068,9 @@ static int _PromoteValue(
                 {
                     MI_DatetimeA* q;
                     NEW_ARRAY_T(q, MI_Datetime, p->size);
+                    if(q == NULL) {
+                        return -1;
+                    }
 
                     for (i = 0; i < p->size; i++)
                     {
@@ -1092,6 +1153,9 @@ int InitializerToValue(
     {
         MI_Sint64A* p;
         NEW_ARRAY_T(p, MI_Sint64, self->size);
+        if(p == NULL) {
+            return -1;
+        }
         p->data = NULL;
         *value = p; 
         return 0;
@@ -1121,6 +1185,9 @@ int InitializerToValue(
                     {
                         MI_Uint8A* p;
                         NEW_ARRAY_T(p, MI_Uint8, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1138,6 +1205,9 @@ int InitializerToValue(
                     {
                         MI_Sint8A* p;
                         NEW_ARRAY_T(p, MI_Sint8, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1155,6 +1225,9 @@ int InitializerToValue(
                     {
                         MI_Uint16A* p;
                         NEW_ARRAY_T(p, MI_Uint16, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1172,6 +1245,9 @@ int InitializerToValue(
                     {
                         MI_Sint16A* p;
                         NEW_ARRAY_T(p, MI_Sint16, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1189,6 +1265,9 @@ int InitializerToValue(
                     {
                         MI_Uint32A* p;
                         NEW_ARRAY_T(p, MI_Uint32, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1206,6 +1285,9 @@ int InitializerToValue(
                     {
                         MI_Sint32A* p;
                         NEW_ARRAY_T(p, MI_Sint32, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1223,6 +1305,9 @@ int InitializerToValue(
                     {
                         MI_Uint64A* p;
                         NEW_ARRAY_T(p, MI_Uint64, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1240,6 +1325,9 @@ int InitializerToValue(
                     {
                         MI_Sint64A* p;
                         NEW_ARRAY_T(p, MI_Sint64, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1265,6 +1353,9 @@ int InitializerToValue(
                     {
                         MI_Real32A* p;
                         NEW_ARRAY_T(p, MI_Real32, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1279,6 +1370,9 @@ int InitializerToValue(
                     {
                         MI_Real64A* p;
                         NEW_ARRAY_T(p, MI_Real64, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1302,6 +1396,9 @@ int InitializerToValue(
                     {
                         MI_Char16A* p;
                         NEW_ARRAY_T(p, MI_Char16, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1325,6 +1422,9 @@ int InitializerToValue(
                     {
                         MI_StringA* p;
                         NEW_ARRAY_T(p, MI_String, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1339,6 +1439,9 @@ int InitializerToValue(
                     {
                         MI_DatetimeA* p;
                         NEW_ARRAY_T(p, MI_Datetime, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1367,6 +1470,9 @@ int InitializerToValue(
                     {
                         MI_BooleanA* p;
                         NEW_ARRAY_T(p, MI_Boolean, self->size);
+                        if(p == NULL) {
+                            return -1;
+                        }
 
                         for (i = 0; i < self->size; i++)
                         {
@@ -1395,6 +1501,9 @@ int InitializerToValue(
                     {
                         MI_InstanceA* arr;
                         arr = (MI_InstanceA*)Batch_Get(state->batch, sizeof(MI_InstanceA) + sizeof(MI_Instance*)*self->size);
+                        if(arr == NULL) {
+                            return -1;
+                        }
                         arr->data = (MI_Instance**)(arr + 1);
                         arr->size = self->size;
                         for (i = 0; i < self->size; i++)
@@ -1434,6 +1543,9 @@ int InitializerToValue(
                     case MI_UINT8:
                     {
                         MI_Uint8* p = MALLOC_T(MI_Uint8, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         MI_Sint64 x = self->data->value.integer;
                         if (0 != _CheckRange(state, x, MI_UINT8))
                             return -1;
@@ -1445,6 +1557,9 @@ int InitializerToValue(
                     case MI_SINT8:
                     {
                         MI_Sint8* p = MALLOC_T(MI_Sint8, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         MI_Sint64 x = self->data->value.integer;
                         if (0 != _CheckRange(state, x, MI_SINT8))
                             return -1;
@@ -1456,6 +1571,9 @@ int InitializerToValue(
                     case MI_UINT16:
                     {
                         MI_Uint16* p = MALLOC_T(MI_Uint16, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         MI_Sint64 x = self->data->value.integer;
                         if (0 != _CheckRange(state, x, MI_UINT16))
                             return -1;
@@ -1467,6 +1585,9 @@ int InitializerToValue(
                     case MI_SINT16:
                     {
                         MI_Sint16* p = MALLOC_T(MI_Sint16, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         MI_Sint64 x = self->data->value.integer;
                         if (0 != _CheckRange(state, x, MI_SINT16))
                             return -1;
@@ -1478,6 +1599,9 @@ int InitializerToValue(
                     case MI_UINT32:
                     {
                         MI_Uint32* p = MALLOC_T(MI_Uint32, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         MI_Sint64 x = self->data->value.integer;
                         if (0 != _CheckRange(state, x, MI_UINT32))
                             return -1;
@@ -1489,6 +1613,9 @@ int InitializerToValue(
                     case MI_SINT32:
                     {
                         MI_Sint32* p = MALLOC_T(MI_Sint32, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         MI_Sint64 x = self->data->value.integer;
                         if (0 != _CheckRange(state, x, MI_SINT32))
                             return -1;
@@ -1500,6 +1627,9 @@ int InitializerToValue(
                     case MI_UINT64:
                     {
                         MI_Uint64* p = MALLOC_T(MI_Uint64, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         MI_Sint64 x = self->data->value.integer;
                         if (0 != _CheckRange(state, x, MI_UINT64))
                             return -1;
@@ -1511,6 +1641,9 @@ int InitializerToValue(
                     case MI_SINT64:
                     {
                         MI_Sint64* p = MALLOC_T(MI_Sint64, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         MI_Sint64 x = self->data->value.integer;
                         if (0 != _CheckRange(state, x, MI_SINT64))
                             return -1;
@@ -1531,6 +1664,9 @@ int InitializerToValue(
                     case MI_REAL32:
                     {
                         MI_Real32* p = MALLOC_T(MI_Real32, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         *p = (MI_Real32)self->data->value.real;
                         *value = p; 
                         return 0;
@@ -1538,6 +1674,9 @@ int InitializerToValue(
                     case MI_REAL64:
                     {
                         MI_Real64* p = MALLOC_T(MI_Real64, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         *p = (MI_Real64)self->data->value.real;
                         *value = p; 
                         return 0;
@@ -1554,6 +1693,9 @@ int InitializerToValue(
                     case MI_CHAR16:
                     {
                         MI_Char16* p = MALLOC_T(MI_Char16, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         *p = (MI_Char16)self->data->value.character;
                         *value = p; 
                         return 0;
@@ -1585,7 +1727,7 @@ int InitializerToValue(
                     {
                         MI_Datetime *p = MALLOC_T(MI_Datetime, 1);
 
-                        if (_StrToDatetime(mofstate, self->data->value.string, p) != 0)
+                        if (p == NULL || _StrToDatetime(mofstate, self->data->value.string, p) != 0)
                         {
                             return -1;
                         }
@@ -1606,6 +1748,9 @@ int InitializerToValue(
                     case MI_BOOLEAN:
                     {
                         MI_Boolean* p = MALLOC_T(MI_Boolean, 1);
+                        if(p == NULL) {
+                            return -1;
+                        }
                         *p = (MI_Boolean)self->data->value.boolean;
                         *value = p; 
                         return 0;

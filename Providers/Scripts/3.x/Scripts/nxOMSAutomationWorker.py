@@ -744,7 +744,7 @@ def kill_worker_manager(workspace_id):
         throws exception if process was running and could not be killed
     """
     workspace_id = workspace_id.decode() if isinstance(workspace_id, bytes) else workspace_id
-    pattern_match_string = "python\s.*main\.py.*%s%s\s" % (WORKSPACE_ID_PREFIX, workspace_id)
+    pattern_match_string = "python3\s.*main\.py.*%s%s\s" % (WORKSPACE_ID_PREFIX, workspace_id)
 
     retval = kill_process_by_pattern_string(pattern_match_string)
     # can't depend on the return value to ensure that the process was killed since it pattern matches

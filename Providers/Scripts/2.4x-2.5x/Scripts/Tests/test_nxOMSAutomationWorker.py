@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 #============================================================================
 # Copyright (c) Microsoft Corporation. All rights reserved. See license.txt for license information.
 #============================================================================
@@ -304,7 +304,7 @@ class nxOMSAutomationWorkerTestCases(unittest2.TestCase):
         self.assertFalse(nxOMSAutomationWorker.is_certificate_valid(nxOMSAutomationWorker.AUTO_REGISTERED_WORKER_CONF_PATH, os.path.join(self.dummyFileLocation, "dummy_notMatch.crt")))
 
     def test_kill_any_worker_running_as_omsagent(self):
-        proc = subprocess.Popen(["sudo", "-u", "omsagent", "python", nxOMSAutomationWorker.WORKER_MANAGER_START_PATH])
+        proc = subprocess.Popen(["sudo", "-u", "omsagent", "python2", nxOMSAutomationWorker.WORKER_MANAGER_START_PATH])
         ret_code = proc.poll()
         # make sure process is running
         self.assertTrue(ret_code is None)

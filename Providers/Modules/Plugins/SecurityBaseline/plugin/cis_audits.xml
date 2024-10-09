@@ -1,0 +1,349 @@
+<baseline BaselineId="CIS.Linux.1" BaseOrigId="1">
+  <audits>
+    <audit
+      description="Ensure nodev option set on /home partition."
+      msid="1.1.4"
+      impact="An attacker could mount a special device (for example, block or character device) on the /home partition."
+      remediation="Edit the /etc/fstab file and add nodev to the fourth field (mounting options) for the /home partition. For more information, see the fstab(5) manual pages."
+      ruleId="a87f15ed-1115-a22d-6f43-17db97c91111">
+      <check distro="*" command="CheckMatchingLines" regex="nodev" filter="^\S+\s+/home\s" path="/proc/mounts" />
+    </audit>
+
+    <audit
+      description="Ensure nodev option set on /tmp partition."
+      msid="1.1.5"
+      impact="An attacker could mount a special device (for example, block or character device) on the /tmp partition."
+      remediation="Edit the /etc/fstab file and add nodev to the fourth field (mounting options) for the /tmp partition. For more information, see the fstab(5) manual pages."
+      ruleId="a87f15ed-1115-a22d-6f43-17db97c91161">
+      <check distro="*" command="CheckMatchingLines" regex="nodev" filter="^\S+\s+/tmp\s" path="/proc/mounts" />
+    </audit>
+
+    <audit
+      description="Ensure nodev option set on /var/tmp partition."
+      msid="1.1.6"
+      impact="An attacker could mount a special device (for example, block or character device) on the /var/tmp partition."
+      remediation="Edit the /etc/fstab file and add nodev to the fourth field (mounting options) for the /var/tmp partition. For more information, see the fstab(5) manual pages."
+      ruleId="a87f15ed-1115-a22d-6f43-17db97c91181">
+      <check distro="*" command="CheckMatchingLines" regex="nodev" filter="^\S+\s+/var/tmp\s" path="/proc/mounts" />
+    </audit>
+
+    <audit
+      description="Ensure nosuid option set on /tmp partition."
+      msid="1.1.7"
+      impact="Since the /tmp filesystem is only intended for temporary file storage, set this option to ensure that users cannot create setuid files in /var/tmp."
+      remediation="Edit the /etc/fstab file and add nosuid to the fourth field (mounting options) for the /tmp partition. For more information, see the fstab(5) manual pages."
+      ruleId="a87f15ed-1115-a22d-6f43-17db97c91191">
+      <check distro="*" command="CheckMatchingLines" regex="nosuid" filter="^\S+\s+/tmp\s" path="/proc/mounts" />
+    </audit>
+
+    <audit
+      description="Ensure nosuid option set on /var/tmp partition."
+      msid="1.1.8"
+      impact="Since the /var/tmp filesystem is only intended for temporary file storage, set this option to ensure that users cannot create setuid files in /var/tmp."
+      remediation="Edit the /etc/fstab file and add nosuid to the fourth field (mounting options) for the /var/tmp partition. For more information, see the fstab(5) manual pages."
+      ruleId="a87f15ed-1115-a22d-6f43-17db97c91171">
+      <check distro="*" command="CheckMatchingLines" regex="nosuid" filter="^\S+\s+/var/tmp\s" path="/proc/mounts" />
+    </audit>
+
+    <audit
+      description="Ensure noexec option set on /var/tmp partition."
+      msid="1.1.9"
+      impact="Since the `/var/tmp` filesystem is only intended for temporary file storage, set this option to ensure that users cannot run executable binaries from `/var/tmp` ."
+      remediation="Edit the /etc/fstab file and add noexec to the fourth field (mounting options) for the /var/tmp partition. For more information, see the fstab(5) manual pages."
+      ruleId="b97f15dd-8185-a12d-6f43-17db97c98477">
+      <check distro="*" command="CheckMatchingLines" regex="noexec" filter="^\S+\s+/var/tmp\s" path="/proc/mounts" />
+    </audit>
+
+    <audit
+      description="Ensure noexec option set on /dev/shm partition."
+      msid="1.1.16"
+      impact="Setting this option on a file system prevents users from executing programs from shared memory. This deters users from introducing potentially malicious software on the system."
+      remediation="Edit the /etc/fstab file and add noexec to the fourth field (mounting options) for the /dev/shm partition. For more information, see the fstab(5) manual pages."
+      ruleId="11e6dc3b-0659-3dc8-7d12-8eb0bb6c0890">
+      <check distro="*" command="CheckMatchingLines" regex="noexec" filter="^\S+\s+/dev/shm\s" path="/proc/mounts" />
+    </audit>
+
+    <audit
+      description="Disable automounting"
+      msid="1.1.21"
+      impact="With automounting enabled, anyone with physical access could attach a USB drive or disc and have its contents available in system even if they lack permissions to mount it themselves."
+      remediation="Disable the autofs service or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-autofs'"
+      ruleId="8cffbbca-3e5b-9af9-65fe-ff7b6316565d">
+      <check distro="*" command="CheckServiceDisabled" service="autofs" />
+    </audit>
+
+    <audit
+      description="Ensure core dumps are restricted."
+      msid="1.5.1"
+      impact="Setting a hard limit on core dumps prevents users from overriding the soft variable. If core dumps are required, consider setting limits for user groups (see `limits.conf(5)` ). In addition, setting the `fs.suid_dumpable` variable to 0 will prevent setuid programs from dumping core."
+      remediation="Add `hard core 0` to /etc/security/limits.conf or a file in the limits.d directory and set `fs.suid_dumpable = 0` in sysctl  or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-core-dumps'"
+      ruleId="429123d4-7e7d-2737-6542-2e86b82c16a1">
+      <check distro="*" command="CheckMatchingLines" regex="\*\s+hard\s+core\s+0\s*$" path="/etc/security/limits.conf">
+      </check>
+      <check distro="*" command="CheckSysctlOutput" regex="^fs\.suid_dumpable\s=\s0$"/>
+    </audit>
+
+    <audit
+      description="Ensure prelink is disabled."
+      msid="1.5.4"
+      impact="The prelinking feature can interfere with the operation of AIDE, because it changes binaries. Prelinking can also increase the vulnerability of the system if a malicious user is able to compromise a common library such as libc."
+      remediation="uninstall `prelink` using your package manager  or run '/opt/microsoft/omsagent/plugin/omsremediate -r remove-prelink'"
+      ruleId="cdee3703-321a-69c4-107f-e7b350a95e5a">
+      <check distro="*" command="CheckPackageNotInstalled" packagename="prelink"/>
+    </audit>
+
+    <audit
+      description="Ensure permissions on /etc/motd are configured."
+      msid="1.7.1.4"
+      impact="If the `/etc/motd` file does not have the correct ownership, it could be modified by unauthorized users with incorrect or misleading information."
+      remediation="Set the owner and group of /etc/motd to root and set permissions to 0644 or run '/opt/microsoft/omsagent/plugin/omsremediate -r file-permissions'"
+      ruleId="b08735e4-8565-0ab1-0fba-b15e31be98e4">
+      <check distro="*" command="CheckFileStatsIfExists" path="/etc/motd" owner="root" group="root" mode="644" allow-stricter="true" />
+    </audit>
+
+    <audit
+      description="Ensure permissions on /etc/issue are configured."
+      msid="1.7.1.5"
+      impact="If the `/etc/issue` file does not have the correct ownership, it could be modified by unauthorized users with incorrect or misleading information."
+      remediation="Set the owner and group of /etc/issue to root and set permissions to 0644 or run '/opt/microsoft/omsagent/plugin/omsremediate -r file-permissions'"
+      ruleId="69032884-324a-3289-a171-b17a541f7adb">
+      <check distro="*" command="CheckFileStats" path="/etc/issue" owner="root" group="root" mode="644" allow-stricter="true" />
+    </audit>
+
+    <audit
+      description="Ensure permissions on /etc/issue.net are configured."
+      msid="1.7.1.6"
+      impact="If the `/etc/issue.net` file does not have the correct ownership, it could be modified by unauthorized users with incorrect or misleading information."
+      remediation="Set the owner and group of /etc/issue.net to root and set permissions to 0644 or run '/opt/microsoft/omsagent/plugin/omsremediate -r file-permissions'"
+      ruleId="9110c0c6-27f1-065e-140d-2672c1ad055b">
+      <check distro="*" command="CheckFileStats" path="/etc/issue.net" owner="root" group="root" mode="644" allow-stricter="true" />
+    </audit>
+
+    <audit
+      description="Ensure talk client is not installed."
+      msid="2.3.3"
+      impact="The software presents a security risk as it uses unencrypted protocols for communication."
+      remediation="Uninstall `talk` or run '/opt/microsoft/omsagent/plugin/omsremediate -r remove-talk'"
+      ruleId="5133422e-990f-971e-661d-ccfc913c1d2c">
+      <check distro="*" command="CheckPackageNotInstalled" packagename="talk"/>
+    </audit>
+
+    <audit
+      description="Ensure permissions on /etc/hosts.allow are configured."
+      msid="3.4.4"
+      impact="It is critical to ensure that the `/etc/hosts.allow` file is protected from unauthorized write access. Although it is protected by default, the file permissions could be changed either inadvertently or through malicious actions."
+      remediation="Set the owner and group of /etc/hosts.allow to root and the permissions to 0644 or run '/opt/microsoft/omsagent/plugin/omsremediate -r file-permissions'"
+      ruleId="1d498679-5780-6db3-14cc-6433011e0310">
+      <check distro="*" command="CheckFileStatsIfExists" path="/etc/hosts.allow" owner="root" group="root" mode="644" allow-stricter="true"/>
+    </audit>
+
+    <audit
+      description="Ensure permissions on /etc/hosts.deny are configured."
+      msid="3.4.5"
+      impact="It is critical to ensure that the `/etc/hosts.deny` file is protected from unauthorized write access. Although it is protected by default, the file permissions could be changed either inadvertently or through malicious actions."
+      remediation="Set the owner and group of /etc/hosts.deny to root and the permissions to 0644 or run '/opt/microsoft/omsagent/plugin/omsremediate -r file-permissions'"
+      ruleId="71d554b5-1436-9676-1966-939ded8d0a37">
+      <check distro="*" command="CheckFileStatsIfExists" path="/etc/hosts.deny" owner="root" group="root" mode="644" allow-stricter="true"/>
+    </audit>
+
+    <audit
+      description="Ensure default deny firewall policy"
+      msid="3.6.2"
+      impact="With a default accept policy the firewall will accept any packet that is not configured to be denied. It is easier to maintain a secure firewall with a default DROP policy than it is with a default ALLOW policy."
+      remediation="Set the default policy for incoming, outgoing, and routed traffic to `deny` or `reject` as appropriate using your firewall software"
+      ruleId="eb6c608a-2316-41bd-aa00-604249e31f27">
+      <check
+        distro="*"
+        command="CheckIptablesStatus"
+        regex="Chain\sINPUT\s\(policy\sDROP\)">
+      </check>
+      <check
+        distro="*"
+        command="CheckIptablesStatus"
+        regex="Chain\sFORWARD\s\(policy\sDROP\)">
+      </check>
+      <check
+        distro="*"
+        command="CheckIptablesStatus"
+        regex="Chain\sOUTPUT\s\(policy\sDROP\)">
+      </check>
+    </audit>
+
+    <audit
+      description="Ensure password creation requirements are configured."
+      msid="5.3.1"
+      impact="Strong passwords protect systems from being hacked through brute force methods."
+      remediation="Set the following key/value pairs in the appropriate PAM for your distro: minlen=14, minclass = 4, dcredit = -1, ucredit = -1, ocredit = -1, lcredit = -1, or run '/opt/microsoft/omsagent/plugin/omsremediate -r enable-password-requirements'"
+      ruleId="b042fda5-55f6-17ba-78d5-1ba33a4709f5">
+      <check distro="SLES" command="CheckMatchingLinesAll" path="/etc/pam.d/common-password" filter="password\s+(?:requisite|required)\s+pam_cracklib\.so" regex="(try_first_pass(?:\s+|$))|(minlen=(?:1[4-9]|[2-9][0-9])(?:\s+|$))|(dcredit=-1(?:\s+|$))|(ucredit=-1(?:\s+|$))|(ocredit=-1(?:\s+|$))|(lcredit=-1(?:\s+|$))"/>
+      <check distro="CentOS=6|RedHat=6|Oracle=6" command="CheckMatchingLinesAll" path="/etc/pam.d/system-auth" filter="password\s+(?:requisite|required)\s+pam_cracklib\.so" regex="(try_first_pass(?:\s+|$))|(minlen=(?:1[4-9]|[2-9][0-9])(?:\s+|$))|(dcredit=-1(?:\s+|$))|(ucredit=-1(?:\s+|$))|(ocredit=-1(?:\s+|$))|(lcredit=-1(?:\s+|$))"/>
+      <check distro="CentOS=6|RedHat=6|Oracle=6" command="CheckMatchingLinesAll" path="/etc/pam.d/password-auth" filter="password\s+(?:requisite|required)\s+pam_cracklib\.so" regex="(try_first_pass(?:\s+|$))|(minlen=(?:1[4-9]|[2-9][0-9])(?:\s+|$))|(dcredit=-1(?:\s+|$))|(ucredit=-1(?:\s+|$))|(ocredit=-1(?:\s+|$))|(lcredit=-1(?:\s+|$))"/>
+      <check distro="CentOS>6|RedHat>6|Oracle>6|Ubuntu|Debian|Mariner|AlmaLinux|Rocky" command="CheckFileExists" path="/etc/security/pwquality.conf"/>
+      <check distro="CentOS>6|RedHat>6|Oracle>6|Ubuntu|Debian|Mariner|AlmaLinux|Rocky" command="CheckPwQuality" path="/etc/security/pwquality.conf"/>
+    </audit>
+
+    <audit
+      description="Ensure lockout for failed password attempts is configured."
+      msid="5.3.2"
+      impact="Locking out user IDs after `n` unsuccessful consecutive login attempts mitigates brute force password attacks against your systems."
+      remediation="for Ubuntu and Debian, add the pam_tally and pam_deny modules as appropriate. For all other distros, refer to your distro's documentation"
+      ruleId="1895704d-a326-90ca-3795-3a1289e7482d">
+      <check distro="*" command="CheckMatchingLinesAllIfExists" path="/etc/pam.d/common-auth" filter="\s+pam_tally2\.so\s+" regex="(deny=[1-5])|(unlock_time=[1-9][0-9]{2,})"/>
+      <check distro="*" command="CheckMatchingLinesAllIfExists" path="/etc/pam.d/password-auth" filter="^\s*auth\s+required\s+pam_faillock\.so\s+" regex="(deny=[1-5])|(unlock_time=[1-9][0-9]{2,})"/>
+      <check distro="*" command="CheckMatchingLinesAllIfExists" path="/etc/pam.d/system-auth" filter="^\s*auth\s+required\s+pam_faillock\.so\s+" regex="(deny=[1-5])|(unlock_time=[1-9][0-9]{2,})"/>
+    </audit>
+
+    <audit
+      description="Ensure all users' home directories exist"
+      msid="6.2.7"
+      impact="If the user's home directory does not exist or is unassigned, the user will be placed in '/' and will not be able to write any files or have local environment variables set."
+      remediation="If any users' home directories do not exist, create them and make sure the respective user owns the directory. Users without an assigned home directory should be removed or assigned a home directory as appropriate."
+      ruleId="c07e6adc-93ab-1d40-2c6d-f3f16ca9561d">
+    <check distro="*" command="CheckUserDirs" expect="exists"/>
+    </audit>
+
+    <audit
+      description="Ensure users own their home directories"
+      msid="6.2.9"
+      impact="Since the user is accountable for files stored in the user home directory, the user must be the owner of the directory."
+      remediation="Change the ownership of any home directories that are not owned by the defined user to the correct user."
+      ruleId="54e255d1-038a-860b-48a2-3d1821e34661">
+      <check distro="*" command="CheckUserDirs" expect="owner"/>
+    </audit>
+
+    <audit
+      description="Ensure users' dot files are not group or world writable."
+      msid="6.2.10"
+      impact="Group or world-writable user configuration files may enable malicious users to steal or modify other users' data or to gain another user's system privileges."
+      remediation="Making global modifications to users' files without alerting the user community can result in unexpected outages and unhappy users. Therefore, it is recommended that a monitoring policy be established to report user dot file permissions and determine the action to be taken in accordance with site policy."
+      ruleId="086cb95b-5427-3ac0-9b98-c5c5b593579a">
+      <check distro="*" command="CheckUserDirs" expect="FileMatchPerm" regex="^\.\S+" mode-mask="744"/>
+    </audit>
+
+    <audit
+      description="Ensure no users have .forward files"
+      msid="6.2.11"
+      impact="Use of the `.forward` file poses a security risk in that sensitive data may be inadvertently transferred outside the organization. The `.forward` file also poses a risk as it can be used to execute commands that may perform unintended actions."
+      remediation="Making global modifications to users' files without alerting the user community can result in unexpected outages and unhappy users. Therefore, it is recommended that a monitoring policy be established to report user `.forward` files and determine the action to be taken in accordance with site policy."
+      ruleId="d02297d2-9f49-5276-0a92-5ac1e42e243c">
+      <check distro="*" command="CheckUserDirs" expect="FileNotExists" path=".forward"/>
+    </audit>
+
+    <audit
+      description="Ensure no users have .netrc files"
+      msid="6.2.12"
+      impact="The `.netrc` file presents a significant security risk since it stores passwords in unencrypted form. Even if FTP is disabled, user accounts may have brought over `.netrc` files from other systems which could pose a risk to those systems"
+      remediation="Making global modifications to users' files without alerting the user community can result in unexpected outages and unhappy users. Therefore, it is recommended that a monitoring policy be established to report user `.netrc` files and determine the action to be taken in accordance with site policy."
+      ruleId="c1b7767e-6c84-6a54-10b8-b9797a8d707a">
+      <check distro="*" command="CheckUserDirs" expect="FileNotExists" path=".netrc"/>
+    </audit>
+
+    <audit
+      description="Ensure no users have .rhosts files"
+      msid="6.2.14"
+      impact="This action is only meaningful if `.rhosts` support is permitted in the file `/etc/pam.conf` . Even though the `.rhosts` files are ineffective if support is disabled in `/etc/pam.conf` , they may have been brought over from other systems and could contain information useful to an attacker for those other systems."
+      remediation="Making global modifications to users' files without alerting the user community can result in unexpected outages and unhappy users. Therefore, it is recommended that a monitoring policy be established to report user `.rhosts` files and determine the action to be taken in accordance with site policy."
+      ruleId="28884fab-89e2-2250-a057-6f35637b4848">
+      <check distro="*" command="CheckUserDirs" expect="FileNotExists" path=".rhosts"/>
+    </audit>
+
+    <audit
+      description="Ensure all groups in /etc/passwd exist in /etc/group"
+      msid="6.2.15"
+      impact="Groups which are defined in the /etc/passwd file but not in the /etc/group file poses a threat to system security since group permissions are not properly managed."
+      remediation="For each group defined in /etc/passwd, ensure there is a corresponding group in /etc/group"
+      ruleId="835a98f5-46da-5332-6b45-38df223e9d9a">
+      <check distro="*" command="CheckGroupValidity"/>
+    </audit>
+
+    <audit
+      description="Ensure no duplicate UIDs exist"
+      msid="6.2.16"
+      impact="Users must be assigned unique UIDs for accountability and to ensure appropriate access protections."
+      remediation="Establish unique UIDs and review all files owned by the shared UIDs to determine which UID they are supposed to belong to."
+      ruleId="df7fd9e2-0cd0-47c1-92b0-f3cab6e06869">
+      <check distro="*" command="CheckNoDuplicateAccounts" path="/etc/passwd" variable="2"/>
+    </audit>
+
+    <audit
+      description="Ensure no duplicate GIDs exist"
+      msid="6.2.17"
+      impact="Groups must be assigned unique GIDs for accountability and to ensure appropriate access protections."
+      remediation="Establish unique GIDs and review all files owned by the shared GIDs to determine which GID they are supposed to belong to."
+      ruleId="70f3d785-1410-440f-6f6d-79b051039d21">
+      <check distro="*" command="CheckNoDuplicateAccounts" path="/etc/group" variable="2"/>
+    </audit>
+
+    <audit
+      description="Ensure no duplicate user names exist"
+      msid="6.2.18"
+      impact="If a user is assigned a duplicate user name, it will create and have access to files with the first UID for that username in `/etc/passwd` . For example, if 'test4' has a UID of 1000 and a subsequent 'test4' entry has a UID of 2000, logging in as 'test4' will use UID 1000. Effectively, the UID is shared, which is a security problem."
+      remediation="Establish unique user names for all users. File ownerships will automatically reflect the change as long as the users have unique UIDs."
+      ruleId="017e0242-25b9-2c72-7ac6-d601086f5c8b">
+      <check distro="*" command="CheckNoDuplicateAccounts" path="/etc/passwd" variable="0"/>
+    </audit>
+
+    <audit
+      description="Ensure no duplicate groups exist"
+      msid="6.2.19"
+      impact="If a group is assigned a duplicate group name, it will create and have access to files with the first GID for that group in `/etc/group` . Effectively, the GID is shared, which is a security problem."
+      remediation="Establish unique names for all user groups. File group ownerships will automatically reflect the change as long as the groups have unique GIDs."
+      ruleId="bc5844b6-7e40-4f2f-7e81-1cbd18885dae">
+      <check distro="*" command="CheckNoDuplicateAccounts" path="/etc/group" variable="0"/>
+    </audit>
+
+    <audit
+      description="Ensure shadow group is empty"
+      msid="6.2.20"
+      impact="Any users assigned to the shadow group would be granted read access to the /etc/shadow file. If attackers can gain read access to the `/etc/shadow` file, they can easily run a password cracking program against the hashed passwords to break them. Other security information that is stored in the `/etc/shadow` file (such as expiration) could also be useful to subvert additional user accounts."
+      remediation="Remove all users form the shadow group"
+      ruleId="cbdc33fa-0f1c-0a90-7fe9-8ef1cf6643c2">
+      <check distro="*" command="CheckNoMatchingLines" path="/etc/group" regex="^shadow:.*:.*:\S+"/>
+    </audit>
+  </audits>
+  <remediations>
+  <!--
+    Remediations are preformed in the order they appear in this file.
+    All actions in a remediation that match the distro are performed, and in the order they appear.
+  -->
+
+    <remediation id="disable-autofs" msids="1.1.21" description="Disable autofs">
+      <action distro="*" action="ActionDisableService" service="autofs"/>
+    </remediation>
+
+    <remediation id="disable-core-dumps" msids="1.5.1">
+      <action distro="*" action="ActionEditConfig" name-regex="\*\s*hard\s+core" name="* hard core" value="0" value-regex="[0-9]+" path="/etc/security/limits.conf"/>
+      <action distro="*" action="ActionEditConfig" name="fs.suid_dumpable" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+sysctl -w fs.suid_dumpable=0
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="remove-prelink" msids="1.5.4" description="Ensure prelink is not installed">
+      <action distro="*" action="ActionRemovePackage" package="prelink"/>
+    </remediation>
+
+    <remediation id="file-permissions" msids="1.7.1.4,1.7.1.5,1.7.1.6,3.4.4,3.4.5" description="Ensure permissions on /etc/motd /etc/issue /etc/hosts.allow  /etc/hosts.deny and /etc/issue.net are configured">
+      <action distro="*" action="ActionSetPerms" path="/etc/motd" name="root:root" value="0644"/>
+      <action distro="*" action="ActionSetPerms" path="/etc/issue" name="root:root" value="0644"/>
+      <action distro="*" action="ActionSetPerms" path="/etc/issue.net" name="root:root" value="0644"/>
+      <action distro="*" action="ActionSetPerms" path="/etc/hosts.allow" name="root:root" value="0644"/>
+      <action distro="*" action="ActionSetPerms" path="/etc/hosts.deny" name="root:root" value="0644"/>
+    </remediation>
+
+    <remediation id="remove-talk" msids="2.3.3" description="Remove talk client">
+      <action distro="*" action="ActionRemoveService" service="talk"/>
+    </remediation>
+
+    <remediation id="enable-password-requirements" msids="5.3.1" description="Ensure password creation requirements are configured">
+      <action distro="Ubuntu|Debian" action="ActionInstallPackage" package="libpam-pwquality"/>
+      <action distro="CentOS>6|RedHat>6|Oracle>6|Ubuntu|Debian|AlmaLinux|Rocky" action="ActionEditConfig" path="/etc/security/pwquality.conf" name="minlen" sep=" = " value="14" value-regex="[1-9][0-9]*"/>
+      <action distro="CentOS>6|RedHat>6|Oracle>6|Ubuntu|Debian|AlmaLinux|Rocky" action="ActionEditConfig" path="/etc/security/pwquality.conf" name="minclass" sep=" = " value="4" value-regex="[0-4]"/>
+    </remediation>
+
+  </remediations>
+</baseline>

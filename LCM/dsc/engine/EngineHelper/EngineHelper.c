@@ -1457,7 +1457,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_BOOLEANA : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.booleana.size; j++)
                         {
@@ -1470,7 +1476,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_UINT8A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.uint8a.size; j++)
                         {
@@ -1483,7 +1495,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_UINT16A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.uint16a.size; j++)
                         {
@@ -1496,7 +1514,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_UINT32A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.uint32a.size; j++)
                         {
@@ -1509,7 +1533,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_UINT64A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.uint64a.size; j++)
                         {
@@ -1522,7 +1552,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_SINT8A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.sint8a.size; j++)
                         {
@@ -1535,7 +1571,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_SINT16A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.sint16a.size; j++)
                         {
@@ -1548,7 +1590,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_SINT32A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.sint32a.size; j++)
                         {
@@ -1561,7 +1609,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_SINT64A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.sint64a.size; j++)
                         {
@@ -1574,7 +1628,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_REAL32A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real32a.size; j++)
                         {
@@ -1587,7 +1647,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_REAL64A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real64a.size; j++)
                         {
@@ -1600,7 +1666,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_CHAR16A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real64a.size; j++)
                         {
@@ -1613,7 +1685,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_DATETIMEA : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real64a.size; j++)
                         {
@@ -1647,7 +1725,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_STRINGA : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real64a.size; j++)
                         {
@@ -1660,7 +1744,13 @@ MI_Result  Convert_MIInstance_JSON (
                     case MI_INSTANCEA : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real64a.size; j++)
                         {
@@ -1802,7 +1892,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_BOOLEANA : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.booleana.size; j++)
                         {
@@ -1815,7 +1911,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_UINT8A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.uint8a.size; j++)
                         {
@@ -1828,7 +1930,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_UINT16A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.uint16a.size; j++)
                         {
@@ -1841,7 +1949,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_UINT32A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.uint32a.size; j++)
                         {
@@ -1854,7 +1968,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_UINT64A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.uint64a.size; j++)
                         {
@@ -1867,7 +1987,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_SINT8A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.sint8a.size; j++)
                         {
@@ -1880,7 +2006,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_SINT16A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.sint16a.size; j++)
                         {
@@ -1893,7 +2025,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_SINT32A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.sint32a.size; j++)
                         {
@@ -1906,7 +2044,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_SINT64A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.sint64a.size; j++)
                         {
@@ -1919,7 +2063,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_REAL32A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real32a.size; j++)
                         {
@@ -1932,7 +2082,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_REAL64A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real64a.size; j++)
                         {
@@ -1945,7 +2101,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_CHAR16A : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real64a.size; j++)
                         {
@@ -1958,7 +2120,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_DATETIMEA : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real64a.size; j++)
                         {
@@ -1992,7 +2160,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_STRINGA : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real64a.size; j++)
                         {
@@ -2005,7 +2179,13 @@ MI_Result  Convert_MiClass_JSON (
                     case MI_INSTANCEA : {
                         MI_Uint32 j = 0;
                         JSON_Value *json_array_value = json_value_init_array();
+                        if(json_array_value == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         JSON_Object *json_array_object = json_value_get_object(json_array_value);
+                        if(json_array_object == NULL) {
+                            return MI_RESULT_FAILED;
+                        }
                         
                         for(j = 0; j < value.real64a.size; j++)
                         {
@@ -2033,6 +2213,9 @@ MI_Result  Print_JSON_Value (
 
     char *serialized_string = NULL;
     serialized_string = json_serialize_to_string_pretty(*p_root_value);
+    if(serialized_string == NULL) {
+        return MI_RESULT_FAILED;
+    }
     puts(serialized_string);
     json_free_serialized_string(serialized_string);
 
@@ -2048,6 +2231,9 @@ MI_Result  Save_JSON_Value (
 
     char *serialized_string = NULL;
     serialized_string = json_serialize_to_string_pretty(*p_root_value);
+    if(serialized_string == NULL) {
+        return MI_RESULT_FAILED;
+    }
     
     FILE * fd = fopen( p_file_path, "w");
     if (fd == NULL)

@@ -17,12 +17,19 @@ import urllib.request, urllib.error, urllib.parse
 
 from httpclient import *
 from workerexception import *
+import workercertificaterotation
+import workerpollingfrequency
 
 PY_MAJOR_VERSION = 0
 PY_MINOR_VERSION = 1
 PY_MICRO_VERSION = 2
 
 SSL_MODULE_NAME = "ssl"
+
+GET_SANDBOX_URL = "GetSandboxActions"
+POLLING_FREQUENCY_HEADER = "PollingFrequency"
+ROTATE_WORKER_CERTIFICATE_HEADER = "RotateWorkerCertificate"
+ENABLE_CERT_ROTATION_FOR_USER_HYBRID_WORKER = 'True'
 
 # On some system the ssl module might be missing
 try:
@@ -119,21 +126,65 @@ class Urllib3HttpClient(HttpClient):
             A RequestResponse
             :param method:
         """
-        https_handler = HttpsClientHandler(self.cert_path, self.key_path, self.insecure)
-        opener = urllib.request.build_opener(https_handler)
-        if self.proxy_configuration is not None:
-            proxy_handler = urllib.request.ProxyHandler({'http': self.proxy_configuration,
+        import tracer
+        try:
+            https_handler = HttpsClientHandler(self.cert_path, self.key_path, self.insecure)
+            opener = urllib.request.build_opener(https_handler)
+            if self.proxy_configuration is not None:
+                proxy_handler = urllib.request.ProxyHandler({'http': self.proxy_configuration,
                                                   'https': self.proxy_configuration})
-            opener.add_handler(proxy_handler)
-        if data is not None:
-            data = data.encode("utf-8")
-        req = urllib.request.Request(url, data=data, headers=headers)
-        req.get_method = lambda: method
-        response = opener.open(req, timeout=30)
-        opener.close()
-        https_handler.close()
+                opener.add_handler(proxy_handler)
+            if data is not None:
+                data = data.encode("utf-8")
+            req = urllib.request.Request(url, data=data, headers=headers)
+            req.get_method = lambda: method
+            response = opener.open(req, timeout=30)           
+            
+            if(GET_SANDBOX_URL in url):
+                try:
+                    # Only Linux User Hybrid Worker certificate are rotated as they use self signed cert
+                    if(configuration.get_worker_type()=="diy" and ROTATE_WORKER_CERTIFICATE_HEADER in response.headers):
+                        tracer.log_debug_trace("Enabling certificate rotation for worker")
+                        workercertificaterotation.set_certificate_rotation_header_value(ENABLE_CERT_ROTATION_FOR_USER_HYBRID_WORKER)   
+                except Exception as ex:
+                    tracer.log_debug_trace("[exception=" + str(ex) + "]" + "[stacktrace=" + str(traceback.format_exc()) + "]")
 
-        return response
+                try:
+                    if(POLLING_FREQUENCY_HEADER in response.headers):
+                        newpollingfrequency = ex.headers[POLLING_FREQUENCY_HEADER]
+                        oldpollingfrequency = str(workerpollingfrequency.get_jrds_get_sandbox_actions_polling_freq())
+
+                        if  oldpollingfrequency != newpollingfrequency:
+                            tracer.log_debug_trace("Changing polling frequency of worker from "+ oldpollingfrequency +" to "+ newpollingfrequency)
+                            workerpollingfrequency.set_jrds_sandbox_actions_polling_freq(newpollingfrequency)
+                except Exception as ex:
+                    tracer.log_debug_trace("[exception=" + str(ex) + "]" + "[stacktrace=" + str(traceback.format_exc()) + "]")
+
+            opener.close()
+            https_handler.close()
+
+            return response
+
+        except Exception as ex:
+            if(GET_SANDBOX_URL in url):
+                # Cases where certificates are invalid (returns 401) or Automation Account of worker is deleted (returns 404), headers are sent as part of GetSandboxActions
+                # Such workers are stale and Polling frequency is set as per the values returned from the headers
+                try:
+                    if((ex is not None) and (ex.headers is not None) and (ex.code is not None)) and (POLLING_FREQUENCY_HEADER in ex.headers and (ex.code==401 or ex.code==404)):
+                        newpollingfrequency = ex.headers[POLLING_FREQUENCY_HEADER]
+                        oldpollingfrequency = str(workerpollingfrequency.get_jrds_get_sandbox_actions_polling_freq())
+
+                        if  oldpollingfrequency != newpollingfrequency:
+                            tracer.log_debug_trace("Changing polling frequency of worker from "+ oldpollingfrequency +" to "+ newpollingfrequency)
+                            workerpollingfrequency.set_jrds_sandbox_actions_polling_freq(newpollingfrequency)
+                except Exception as e:
+                    tracer.log_debug_trace("[exception=" + str(e) + "]" + "[stacktrace=" + str(traceback.format_exc()) + "]")
+
+            opener.close()
+            https_handler.close()
+
+            raise ex
+
 
     def get(self, url, headers=None):
         """Issues a GET request to the provided url and using the provided headers.

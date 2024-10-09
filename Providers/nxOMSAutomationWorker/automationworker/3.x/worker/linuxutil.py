@@ -9,6 +9,8 @@ import subprocess
 import sys
 import re
 import codecs
+import traceback
+from datetime import datetime
 
 # workaround when unexpected environment variables are present
 # sets COLUMNS wide enough so that output of ps does not get truncated
@@ -285,8 +287,21 @@ def get_cert_info(certificate_path):
     """Gets certificate information by invoking OpenSSL (OMS agent dependency).
 
     Returns:
-        A tuple containing the certificate's issuer, subject and thumbprint.
+        A tuple containing the certificate's issuer, subject, thumbprint.
     """
+    issuer, subject, thumbprint, not_before, not_after = get_cert_info_with_dates(certificate_path)
+
+    return issuer, subject, thumbprint
+
+
+@posix_only
+def get_cert_info_with_dates(certificate_path):
+    """Gets certificate information by invoking OpenSSL (OMS agent dependency).
+
+    Returns:
+        A tuple containing the certificate's issuer, subject, thumbprint, start date and end date.
+    """
+
     p = subprocess.Popen(["openssl", "x509", "-noout", "-in", certificate_path, "-fingerprint", "-sha1"],
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
@@ -311,9 +326,27 @@ def get_cert_info(certificate_path):
     if p.poll() != 0:
         raise Exception("Unable to get certificate subject.")
 
+    p = subprocess.Popen(["openssl", "x509", "-noout", "-in", certificate_path, "-startdate"],
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    raw_not_before, e = p.communicate()
+
+    if p.poll() != 0:
+        raise Exception("Unable to get certificate start date.")
+
+    p = subprocess.Popen(["openssl", "x509", "-noout", "-in", certificate_path, "-enddate"],
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    raw_not_after, e = p.communicate()
+
+    if p.poll() != 0:
+        raise Exception("Unable to get certificate end date.")
+
     return parse_issuer_from_openssl_output(raw_issuer.decode()), \
            parse_subject_from_openssl_output(raw_subject.decode()), \
-           parse_thumbprint_from_openssl_output(raw_fingerprint.decode())
+           parse_thumbprint_from_openssl_output(raw_fingerprint.decode()), \
+           parse_not_before_from_openssl_output(raw_not_before.decode()), \
+           parse_not_after_from_openssl_output(raw_not_after.decode())
 
 
 def parse_thumbprint_from_openssl_output(raw_fingerprint):
@@ -362,6 +395,38 @@ def parse_subject_from_openssl_output(raw_subject):
         string : The certificate subject.
     """
     return raw_subject.split("subject=")[1].strip()
+
+
+def parse_not_before_from_openssl_output(raw_not_before):
+    """Parses the not before value from the raw OpenSSL output.
+
+    Example output from openSSL:
+    notBefore=Jun 28 15:25:08 2022 GMT
+
+    Returns:
+        datetime : The certificate not before date.
+    """
+    not_before_date = raw_not_before.split("notBefore=")[1].replace("GMT", "").strip()
+    datetime_object = datetime.strptime(not_before_date, '%b %d %H:%M:%S %Y')
+    date_iso_format = datetime_object.isoformat()
+    return date_iso_format
+
+
+def parse_not_after_from_openssl_output(raw_not_after):
+    """Parses the not after value from the raw OpenSSL output.
+
+    Example output from openSSL:
+    notAfter=Jun 30 15:25:08 2022 GMT
+
+    Returns:
+        datetime : The certificate not after date.
+    """
+
+    not_after_date = raw_not_after.split("notAfter=")[1].replace("GMT", "").strip()
+
+    datetime_object = datetime.strptime(not_after_date, '%b %d %H:%M:%S %Y')
+    date_iso_format = datetime_object.isoformat()
+    return date_iso_format
 
 
 @posix_only

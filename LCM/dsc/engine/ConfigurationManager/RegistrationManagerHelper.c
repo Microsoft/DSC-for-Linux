@@ -208,18 +208,22 @@ MI_Char* InhaleTextFile(MI_Char* filePath)
     {
         if ( fseek (myfile, 0, SEEK_END) == -1 )
         {
+            fclose (myfile);
             return NULL;
         }
         if ( (length = ftell (myfile)) == -1 )
         {
+            fclose (myfile);
             return NULL;
         }
         if ( fseek (myfile, 0, SEEK_SET) == -1 )
         {
+            fclose (myfile);
             return NULL;
         }
         if ( (result = DSC_malloc ((length+1) * sizeof(MI_Char), NitsHere())) == NULL )
         {
+            fclose (myfile);
             return NULL;
         }
         

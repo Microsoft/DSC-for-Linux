@@ -66,7 +66,7 @@ class WorkerManager:
         """
         worker_and_sandbox_processes = []
         for process in process_list:
-            if "python" in process.cmd and ("hybridworker.py" in process.cmd or "sandbox.py" in process.cmd) \
+            if ("python" in process.cmd or "python2" in process.cmd) and ("hybridworker.py" in process.cmd or "sandbox.py" in process.cmd) \
                     and "MSFT_nxOMSAutomationWorkerResource" in process.cmd:
                 worker_and_sandbox_processes.append(process)
         return worker_and_sandbox_processes
@@ -89,7 +89,7 @@ class WorkerManager:
         """
         worker_processes = []
         for process in process_list:
-            if "python" in process.cmd and "hybridworker.py" in process.cmd \
+            if ("python" in process.cmd or "python2" in process.cmd) and "hybridworker.py" in process.cmd \
                     and "MSFT_nxOMSAutomationWorkerResource" in process.cmd:
                 worker_processes.append(process)
         return worker_processes
@@ -243,7 +243,7 @@ class WorkerManager:
         print "worker to be started " + str(len(configuration_path_to_be_started))
 
         if len(configuration_path_to_be_started) > 0 and linuxutil.get_current_username() == NXAUTOMATION_USERNAME:
-            proc = subprocess.Popen(["sudo", "-u", NXAUTOMATION_USERNAME, "python", OMSUTIL_FILE_PATH, "--initialize"],
+            proc = subprocess.Popen(["sudo", "-u", NXAUTOMATION_USERNAME, "python2", OMSUTIL_FILE_PATH, "--initialize"],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output, error = proc.communicate()
             if proc.returncode != 0:
@@ -261,7 +261,7 @@ class WorkerManager:
             # create a new worker if needed
             if os.path.isfile(configuration_path) and start_worker_for_path is True and \
                             self.oms_configuration.get_disable_worker_creation() is False:
-                cmd = ["python", self.oms_configuration.get_hybrid_worker_source_path(), configuration_path, "managed"]
+                cmd = ["python2", self.oms_configuration.get_hybrid_worker_source_path(), configuration_path, "managed"]
 
                 # workspace id arg is used by the oms uninstall script
                 workspace_id = self.oms_configuration.get_workspace_id()

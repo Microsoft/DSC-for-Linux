@@ -948,7 +948,7 @@ MI_Result ValidateDSCProviderMappingForWMIV2Provider( _In_z_ const MI_Char *name
     MI_Result r = MI_RESULT_OK;
     MI_Result innerR = MI_RESULT_OK;
     MI_Boolean moreResults;
-    MI_Result result;
+    MI_Result result = MI_RESULT_INVALID_PARAMETER;
     const MI_Char *errorMessage;
     const MI_Instance *completionDetails = NULL;
     MI_Operation operation = MI_OPERATION_NULL;

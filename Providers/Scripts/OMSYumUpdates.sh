@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$1" = "" ]; then
-    yum check-update |  awk '{print $1}' 
+    yum check-update
     exit ${PIPESTATUS[0]}   
 else
     if [ -e "/usr/bin/repoquery" ]; then

@@ -1,230 +1,58 @@
-<baseline BaselineId="OMS.Linux.1" BaseOrigId="1">
-  <baselines>  
-    <baseline id="SSH.Linux" />
-  </baselines>
-	<audits>
-    <audit
-      description="Ensure nodev option set on /home partition."
-      msid="1.1.4"
-      impact="An attacker could mount a special device (for example, block or character device) on the /home partition."
-      remediation="Edit the /etc/fstab file and nodev the fourth field (mounting options) for the /home partition. For more information, see the fstab(5) manual pages."
-      ruleId="a87f15ed-1115-a22d-6f43-17db97c91111">
-      <check distro="*" command="CheckNoMatchingLines" regex="nodev" filter="\s/home\s" path="/etc/fstab" />
-    </audit>
-    <audit
-      description="Ensure nodev option set on /tmp partition."
-      msid="1.1.5"
-      impact="An attacker could mount a special device (for example, block or character device) on the /tmp partition."
-      remediation="Edit the /etc/fstab file and nodev the fourth field (mounting options) for the /tmp partition. For more information, see the fstab(5) manual pages."
-      ruleId="a87f15ed-1115-a22d-6f43-17db97c91161">
-      <check distro="*" command="CheckNoMatchingLines" regex="nodev" filter="\s/tmp\s" path="/etc/fstab" />
-    </audit>
-    <audit
-      description="Ensure nodev option set on /var/tmp partition."
-      msid="1.1.6"
-      impact="An attacker could mount a special device (for example, block or character device) on the /var/tmp partition."
-      remediation="Edit the /etc/fstab file and nodev the fourth field (mounting options) for the /var/tmp partition. For more information, see the fstab(5) manual pages."
-      ruleId="a87f15ed-1115-a22d-6f43-17db97c91181">
-      <check distro="*" command="CheckNoMatchingLines" regex="nodev" filter="\s/var/tmp\s" path="/etc/fstab" />
-    </audit>
-   <audit
-      description="Ensure nosuid option set on /tmp partition."
-      msid="1.1.7"
-      impact="Since the /tmp filesystem is only intended for temporary file storage, set this option to ensure that users cannot create setuid files in /var/tmp."
-      remediation="Edit the /etc/fstab file and nosuid the fourth field (mounting options) for the /tmp partition. For more information, see the fstab(5) manual pages."
-      ruleId="a87f15ed-1115-a22d-6f43-17db97c91191">
-      <check distro="*" command="CheckNoMatchingLines" regex="nosuid" filter="\s/tmp\s" path="/etc/fstab" />
-    </audit>
-    <audit
-      description="Ensure nosuid option set on /var/tmp partition."
-      msid="1.1.8"
-      impact="Since the /var/tmp filesystem is only intended for temporary file storage, set this option to ensure that users cannot create setuid files in /var/tmp."
-      remediation="Edit the /etc/fstab file and nosuid the fourth field (mounting options) for the /var/tmp partition. For more information, see the fstab(5) manual pages."
-      ruleId="a87f15ed-1115-a22d-6f43-17db97c91171">
-      <check distro="*" command="CheckNoMatchingLines" regex="nosuid" filter="\s/var/tmp\s" path="/etc/fstab" />
-    </audit>
-    <audit
-      description="Ensure noexec option set on /var/tmp partition."
-      msid="1.1.9"
-      impact="Since the `/var/tmp` filesystem is only intended for temporary file storage, set this option to ensure that users cannot run executable binaries from `/var/tmp` ."
-      remediation="Edit the /etc/fstab file and add noexec to the fourth field (mounting options) for the /var/tmp partition. For more information, see the fstab(5) manual pages."
-      ruleId="b97f15dd-8185-a12d-6f43-17db97c98477">
-      <check distro="*" command="CheckNoMatchingLines" regex="noexec" filter="\s/var/tmp\s" path="/etc/fstab" />
-    </audit>
-    <audit
-      description="Ensure noexec option set on /dev/shm partition."
-      msid="1.1.16"
-      impact="Setting this option on a file system prevents users from executing programs from shared memory. This deters users from introducing potentially malicious software on the system."
-      remediation="Edit the /etc/fstab file and add noexec to the fourth field (mounting options) for the /dev/shm partition. For more information, see the fstab(5) manual pages."
-      ruleId="11e6dc3b-0659-3dc8-7d12-8eb0bb6c0890">
-      <check distro="*" command="CheckNoMatchingLines" regex="noexec" filter="\s/dev/shm\s" path="/etc/fstab" />
-    </audit>
-    <audit
-      description="Disable automounting"
-      msid="1.1.21"
-      impact="With automounting enabled anyone with physical access could attach a USB drive or disc and have its contents available in system even if they lacked permissions to mount it themselves."
-      remediation="Disable the autofs service  or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-autofs'"
-      ruleId="8cffbbca-3e5b-9af9-65fe-ff7b6316565d">
-      <check distro="*" command="CheckServiceDisabled" service="autofs" />
-    </audit>
+<baseline BaselineId="Common.Linux.1" BaseOrigId="1">
+  <audits>
     <audit
       description="Ensure mounting of USB storage devices is disabled"
       msid="1.1.21.1"
       impact="Removing support for USB storage devices reduces the local attack surface of the server."
       remediation="Edit or create a file in the `/etc/modprobe.d/` directory ending in .conf and add `install usb-storage /bin/true` then unload the usb-storage module or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-unnecessary-kernel-mods'"
       ruleId="acffbbca-3e5b-9aa9-65ee-ff7b6116565f">
-     <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+usb-storage\s+/bin/true" path="/etc/modprobe.d/"/>
+      <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+usb-storage\s+/bin/true" path="/etc/modprobe.d/"/>
     </audit>
-    <audit
-      description="Ensure core dumps are restricted."
-      msid="1.5.1"
-      impact="Setting a hard limit on core dumps prevents users from overriding the soft variable. If core dumps are required, consider setting limits for user groups (see `limits.conf(5)` ). In addition, setting the `fs.suid_dumpable` variable to 0 will prevent setuid programs from dumping core."
-      remediation="Add `hard core 0` to /etc/security/limits.conf or a file in the limits.d directory and set `fs.suid_dumpable = 0` in sysctl  or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-core-dumps'"
-      ruleId="429123d4-7e7d-2737-6542-2e86b82c16a1">
-      <check distro="*" command="CheckMatchingLines" regex="\*\s+hard\s+core\s+0\s*$" path="/etc/security/limits.conf">
-      </check>
-      <check distro="*" command="CheckSysctlOutput" regex="^fs\.suid_dumpable\s=\s0$"/>
-    </audit>
-    <audit
-      description="Ensure prelink is disabled."
-      msid="1.5.4"
-      impact="The prelinking feature can interfere with the operation of AIDE, because it changes binaries. Prelinking can also increase the vulnerability of the system if a malicious user is able to compromise a common library such as libc."
-      remediation="uninstall `prelink` using your package manager  or run '/opt/microsoft/omsagent/plugin/omsremediate -r remove-prelink'"
-      ruleId="cdee3703-321a-69c4-107f-e7b350a95e5a">
-      <check distro="*" command="CheckPackageNotInstalled" packagename="prelink"/>
-    </audit>
-    <audit
-      description="Ensure permissions on /etc/motd are configured."
-      msid="1.7.1.4"
-      impact="If the `/etc/motd` file does not have the correct ownership, it could be modified by unauthorized users with incorrect or misleading information."
-      remediation="Set the owner and group of /etc/motd to root and set permissions to 0644 or run '/opt/microsoft/omsagent/plugin/omsremediate -r file-permissions'"
-      ruleId="b08735e4-8565-0ab1-0fba-b15e31be98e4">
-      <check distro="*" command="CheckFileStatsIfExists" path="/etc/motd" owner="root" group="root" mode="644" allow-stricter="true" />
-    </audit>
-    <audit
-      description="Ensure permissions on /etc/issue are configured."
-      msid="1.7.1.5"
-      impact="If the `/etc/issue` file does not have the correct ownership, it could be modified by unauthorized users with incorrect or misleading information."
-      remediation="Set the owner and group of /etc/issue to root and set permissions to 0644 or run '/opt/microsoft/omsagent/plugin/omsremediate -r file-permissions'"
-      ruleId="69032884-324a-3289-a171-b17a541f7adb">
-      <check distro="*" command="CheckFileStats" path="/etc/issue" owner="root" group="root" mode="644" allow-stricter="true" />
-    </audit>
-    <audit
-      description="Ensure permissions on /etc/issue.net are configured."
-      msid="1.7.1.6"
-      impact="If the `/etc/issue.net` file does not have the correct ownership, it could be modified by unauthorized users with incorrect or misleading information."
-      remediation="Set the owner and group of /etc/issue.net to root and set permissions to 0644 or run '/opt/microsoft/omsagent/plugin/omsremediate -r file-permissions'"
-      ruleId="9110c0c6-27f1-065e-140d-2672c1ad055b">
-      <check distro="*" command="CheckFileStats" path="/etc/issue.net" owner="root" group="root" mode="644" allow-stricter="true" />
-    </audit>
+
     <audit
       description="The nodev option should be enabled for all removable media."
       msid="2.1"
       cceid="CCE-3522-0"
       severity="Important"
       impact="An attacker could mount a special device (for example, block or character device) via removable media"
-      remediation="Add the nodev option to the fourth field (mounting options) in /etc/fstab"
+      remediation="Add the nodev option to the fourth field (mounting options) in /etc/fstab. For more information, see the fstab(5) manual pages."
       ruleId="5c7537f2-b90b-44a4-89c9-4fca5fd79ef7">
       <check distro="*" command="CheckNoMatchingLines" filter="^[^#]\S+\s+\S*(floppy|cdrom)" regex="nodev" path="/etc/fstab" />
     </audit>
+
     <audit
       description="The noexec option should be enabled for all removable media."
       msid="2.2"
       cceid="CCE-4275-4"
       severity="Important"
       impact="An attacker could load executable file via removable media"
-      remediation="Add the noexec option to the fourth field (mounting options) in /etc/fstab"
+      remediation="Add the noexec option to the fourth field (mounting options) in /etc/fstab. For more information, see the fstab(5) manual pages."
       ruleId="7976cc38-fddb-4913-9295-4fcac2e641c3">
       <check distro="*" command="CheckNoMatchingLines" filter="^[^#]\S+\s+\S*(floppy|cdrom)" regex="noexec" path="/etc/fstab" />
     </audit>
+
     <audit
       description="The nosuid option should be enabled for all removable media."
       msid="2.3"
       cceid="CCE-4042-8"
       severity="Important"
       impact="An attacker could load files that run with an elevated security context via removable media"
-      remediation="Add the nosuid option to the fourth field (mounting options) in /etc/fstab"
+      remediation="Add the nosuid option to the fourth field (mounting options) in /etc/fstab. For more information, see the fstab(5) manual pages."
       ruleId="cdc390c9-fb4a-47f6-90a7-4e1bd6d0e9e6">
       <check distro="*" command="CheckNoMatchingLines" filter="^[^#]\S+\s+\S*(floppy|cdrom)" regex="nosuid" path="/etc/fstab" />
     </audit>
+
     <audit
-      description="Ensure talk client is not installed."
-      msid="2.3.3"
-      impact="The software presents a security risk as it uses unencrypted protocols for communication."
-      remediation="Uninstall `talk`  or run '/opt/microsoft/omsagent/plugin/omsremediate -r remove-talk'"
-      ruleId="5133422e-990f-971e-661d-ccfc913c1d2c">
-      <check distro="*" command="CheckPackageNotInstalled" packagename="talk"/>
-    </audit>
-    <audit
-      description="Ensure permissions on /etc/hosts.allow are configured."
-      msid="3.4.4"
-      impact="It is critical to ensure that the `/etc/hosts.allow` file is protected from unauthorized write access. Although it is protected by default, the file permissions could be changed either inadvertently or through malicious actions."
-      remediation="Set the owner and group of /etc/hosts.allow to root and the permissions to 0644 or run '/opt/microsoft/omsagent/plugin/omsremediate -r file-permissions'"
-      ruleId="1d498679-5780-6db3-14cc-6433011e0310">
-      <check distro="*" command="CheckFileStatsIfExists" path="/etc/hosts.allow" owner="root" group="root" mode="644" allow-stricter="true"/>
-    </audit>
-     <audit
-      description="Ensure permissions on /etc/hosts.deny are configured."
-      msid="3.4.5"
-      impact="It is critical to ensure that the `/etc/hosts.deny` file is protected from unauthorized write access. Although it is protected by default, the file permissions could be changed either inadvertently or through malicious actions."
-      remediation="Set the owner and group of /etc/hosts.deny to root and the permissions to 0644 or run '/opt/microsoft/omsagent/plugin/omsremediate -r file-permissions'"
-      ruleId="71d554b5-1436-9676-1966-939ded8d0a37">
-      <check distro="*" command="CheckFileStatsIfExists" path="/etc/hosts.deny" owner="root" group="root" mode="644" allow-stricter="true"/>
-    </audit>
-     <audit
-      description="Ensure default deny firewall policy"
-      msid="3.6.2"
-      impact="With a default accept policy the firewall will accept any packet that is not configured to be denied. It is easier to maintain a secure firewall with a default DROP policy than it is with a default ALLOW policy."
-      remediation="Set the default policy for incoming, outgoing and routed traffic to `deny` or `reject` as appropriate using your firewall software"
-      ruleId="eb6c608a-2316-41bd-aa00-604249e31f27">
-      <check
-        distro="*"
-        command="CheckIptablesStatus"
-        regex="Chain\sINPUT\s\(policy\sDROP\)">
-      </check>
-      <check
-        distro="*"
-        command="CheckIptablesStatus"
-        regex="Chain\sFORWARD\s\(policy\sDROP\)">
-      </check>
-      <check
-        distro="*"
-        command="CheckIptablesStatus"
-        regex="Chain\sOUTPUT\s\(policy\sDROP\)">
-      </check>
-    </audit>
-     <audit
       description="The nodev/nosuid option should be enabled for all NFS mounts."
       msid="5"
       cceid="CCE-4368-7"
       severity="Important"
       impact="An attacker could load files that run with an elevated security context or special devices via remote file system"
-      remediation="Add the nosuid and nodev options to the fourth field (mounting options) in /etc/fstab"
+      remediation="Add the nosuid and nodev options to the fourth field (mounting options) in /etc/fstab. For more information, see the fstab(5) manual pages."
       ruleId="7ca24433-3c08-4ff5-9fe2-d8e1830c5829">
       <check distro="*" command="CheckNoMatchingLines" filter="nfs\s+" regex="nosuid|nodev" path="/etc/fstab" />
     </audit>
-    <audit
-      description="Ensure password creation requirements are configured."
-      msid="5.3.1"
-      impact="Strong passwords protect systems from being hacked through brute force methods."
-      remediation="Set the following key/value pairs in the appropriate PAM for your distro: minlen=14, minclass = 4, dcredit = -1, ucredit = -1, ocredit = -1, lcredit = -1, or run '/opt/microsoft/omsagent/plugin/omsremediate -r enable-password-requirements'"
-      ruleId="b042fda5-55f6-17ba-78d5-1ba33a4709f5">
-      <check distro="SLES" command="CheckMatchingLinesAll" path="/etc/pam.d/common-password" filter="password\s+(?:requisite|required)\s+pam_cracklib\.so" regex="(try_first_pass(?:\s+|$))|(minlen=(?:1[4-9]|[2-9][0-9])(?:\s+|$))|(dcredit=-1(?:\s+|$))|(ucredit=-1(?:\s+|$))|(ocredit=-1(?:\s+|$))|(lcredit=-1(?:\s+|$))"/>
-      <check distro="CentOS=6|RedHat=6|Oracle=6" command="CheckMatchingLinesAll" path="/etc/pam.d/system-auth" filter="password\s+(?:requisite|required)\s+pam_cracklib\.so" regex="(try_first_pass(?:\s+|$))|(minlen=(?:1[4-9]|[2-9][0-9])(?:\s+|$))|(dcredit=-1(?:\s+|$))|(ucredit=-1(?:\s+|$))|(ocredit=-1(?:\s+|$))|(lcredit=-1(?:\s+|$))"/>
-      <check distro="CentOS=6|RedHat=6|Oracle=6" command="CheckMatchingLinesAll" path="/etc/pam.d/password-auth" filter="password\s+(?:requisite|required)\s+pam_cracklib\.so" regex="(try_first_pass(?:\s+|$))|(minlen=(?:1[4-9]|[2-9][0-9])(?:\s+|$))|(dcredit=-1(?:\s+|$))|(ucredit=-1(?:\s+|$))|(ocredit=-1(?:\s+|$))|(lcredit=-1(?:\s+|$))"/>
-      <check distro="CentOS>6|RedHat>6|Oracle>6|Ubuntu|Debian" command="CheckFileExists" path="/etc/security/pwquality.conf"/>
-      <check distro="CentOS>6|RedHat>6|Oracle>6|Ubuntu|Debian" command="CheckPwQuality" path="/etc/security/pwquality.conf"/>
-    </audit>
-    <audit
-      description="Ensure lockout for failed password attempts is configured."
-      msid="5.3.2"
-      impact="Locking out user IDs after `n` unsuccessful consecutive login attempts mitigates brute force password attacks against your systems."
-      remediation="for Ubuntu and Debian, add the pam_tally and pam_deny modules as appropriate. For all other distros, refer to your distro's documentation"
-      ruleId="1895704d-a326-90ca-3795-3a1289e7482d">
-      <check distro="*" command="CheckMatchingLinesAllIfExists" path="/etc/pam.d/common-auth" filter="\s+pam_tally2\.so\s+" regex="(deny=[1-5])|(unlock_time=[1-9][0-9]{2,})"/>
-      <check distro="*" command="CheckMatchingLinesAllIfExists" path="/etc/pam.d/password-auth" filter="^\s*auth\s+required\s+pam_faillock\.so\s+" regex="(deny=[1-5])|(unlock_time=[1-9][0-9]{2,})"/>
-      <check distro="*" command="CheckMatchingLinesAllIfExists" path="/etc/pam.d/system-auth" filter="^\s*auth\s+required\s+pam_faillock\.so\s+" regex="(deny=[1-5])|(unlock_time=[1-9][0-9]{2,})"/>
-    </audit>
+
     <audit
       description = "Disable the installation and use of file systems that are not required (cramfs)"
       msid="6.1"
@@ -234,111 +62,17 @@
       ruleId="9967cbaf-44be-0dd1-92ab-d4f4034b2d28">
       <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+cramfs\s+/bin/true" path="/etc/modprobe.d/"/>
     </audit>
+
     <audit
-    description = "Disable the installation and use of file systems that are not required (freevxfs)"
-    msid="6.2"
-    severity="Warning"
-    impact="An attacker could use a vulnerability in freevxfs to elevate privileges"
-    remediation="Add a file to the /etc/modprob.d directory that disables freevxfs or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-unnecessary-kernel-mods'"
-    ruleId="4c066a3d-8eba-a210-3228-cff300039363">
-    <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+freevxfs\s+/bin/true" path="/etc/modprobe.d/"/>
+      description = "Disable the installation and use of file systems that are not required (freevxfs)"
+      msid="6.2"
+      severity="Warning"
+      impact="An attacker could use a vulnerability in freevxfs to elevate privileges"
+      remediation="Add a file to the /etc/modprob.d directory that disables freevxfs or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-unnecessary-kernel-mods'"
+      ruleId="4c066a3d-8eba-a210-3228-cff300039363">
+      <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+freevxfs\s+/bin/true" path="/etc/modprobe.d/"/>
     </audit>
-    <audit
-      description="Ensure all users' home directories exist"
-      msid="6.2.7"
-      impact="If the user's home directory does not exist or is unassigned, the user will be placed in '/' and will not be able to write any files or have local environment variables set."
-      remediation="If any users' home directories do not exist, create them and make sure the respective user owns the directory. Users without an assigned home directory should be removed or assigned a home directory as appropriate."
-      ruleId="c07e6adc-93ab-1d40-2c6d-f3f16ca9561d">
-      <check distro="*" command="CheckUserDirs" expect="exists"/>
-    </audit>
-    <audit 
-      description="Ensure users own their home directories" 
-      msid="6.2.9"
-      impact="Since the user is accountable for files stored in the user home directory, the user must be the owner of the directory."
-      remediation="Change the ownership of any home directories that are not owned by the defined user to the correct user."
-      ruleId="54e255d1-038a-860b-48a2-3d1821e34661">
-      <check distro="*" command="CheckUserDirs" expect="owner"/>
-    </audit>
-    <audit
-      description="Ensure users' dot files are not group or world writable."
-      msid="6.2.10"
-      impact="Group or world-writable user configuration files may enable malicious users to steal or modify other users' data or to gain another user's system privileges."
-      remediation="Making global modifications to users' files without alerting the user community can result in unexpected outages and unhappy users. Therefore, it is recommended that a monitoring policy be established to report user dot file permissions and determine the action to be taken in accordance with site policy."
-      ruleId="086cb95b-5427-3ac0-9b98-c5c5b593579a">
-      <check distro="*" command="CheckUserDirs" expect="FileMatchPerm" regex="^\.\S+" mode-mask="744"/>
-    </audit>
-    <audit
-      description="Ensure no users have .forward files"
-      msid="6.2.11"
-      impact="Use of the `.forward` file poses a security risk in that sensitive data may be inadvertently transferred outside the organization. The `.forward` file also poses a risk as it can be used to execute commands that may perform unintended actions."
-      remediation="Making global modifications to users' files without alerting the user community can result in unexpected outages and unhappy users. Therefore, it is recommended that a monitoring policy be established to report user `.forward` files and determine the action to be taken in accordance with site policy."
-      ruleId="d02297d2-9f49-5276-0a92-5ac1e42e243c">
-      <check distro="*" command="CheckUserDirs" expect="FileNotExists" path=".forward"/>
-    </audit>
-    <audit
-      description="Ensure no users have .netrc files"
-      msid="6.2.12"
-      impact="The `.netrc` file presents a significant security risk since it stores passwords in unencrypted form. Even if FTP is disabled, user accounts may have brought over `.netrc` files from other systems which could pose a risk to those systems"
-      remediation="Making global modifications to users' files without alerting the user community can result in unexpected outages and unhappy users. Therefore, it is recommended that a monitoring policy be established to report user `.netrc` files and determine the action to be taken in accordance with site policy."
-      ruleId="c1b7767e-6c84-6a54-10b8-b9797a8d707a">
-      <check distro="*" command="CheckUserDirs" expect="FileNotExists" path=".netrc"/>
-    </audit>
-    <audit
-      description="Ensure no users have .rhosts files"
-      msid="6.2.14"
-      impact="This action is only meaningful if `.rhosts` support is permitted in the file `/etc/pam.conf` . Even though the `.rhosts` files are ineffective if support is disabled in `/etc/pam.conf` , they may have been brought over from other systems and could contain information useful to an attacker for those other systems."
-      remediation="Making global modifications to users' files without alerting the user community can result in unexpected outages and unhappy users. Therefore, it is recommended that a monitoring policy be established to report user `.rhosts` files and determine the action to be taken in accordance with site policy."
-      ruleId="28884fab-89e2-2250-a057-6f35637b4848">
-      <check distro="*" command="CheckUserDirs" expect="FileNotExists" path=".rhosts"/>
-    </audit>
-    <audit
-      description="Ensure all groups in /etc/passwd exist in /etc/group"
-      msid="6.2.15"
-      impact="Groups which are defined in the /etc/passwd file but not in the /etc/group file poses a threat to system security since group permissions are not properly managed."
-      remediation="For each group defined in /etc/passwd, ensure there is a corresponding group in /etc/group"
-      ruleId="835a98f5-46da-5332-6b45-38df223e9d9a">
-      <check distro="*" command="CheckGroupValidity"/>
-    </audit>
-    <audit
-      description="Ensure no duplicate UIDs exist"
-      msid="6.2.16"
-      impact="Users must be assigned unique UIDs for accountability and to ensure appropriate access protections."
-      remediation="Establish unique UIDs and review all files owned by the shared UIDs to determine which UID they are supposed to belong to."
-      ruleId="df7fd9e2-0cd0-47c1-92b0-f3cab6e06869">
-      <check distro="*" command="CheckNoDuplicateAccounts" path="/etc/passwd" variable="2"/>
-    </audit>
-    <audit
-      description="Ensure no duplicate GIDs exist"
-      msid="6.2.17"
-      impact="Groups must be assigned unique GIDs for accountability and to ensure appropriate access protections."
-      remediation="Establish unique GIDs and review all files owned by the shared GIDs to determine which GID they are supposed to belong to."
-      ruleId="70f3d785-1410-440f-6f6d-79b051039d21">
-      <check distro="*" command="CheckNoDuplicateAccounts" path="/etc/group" variable="2"/>
-    </audit>
-    <audit
-      description="Ensure no duplicate user names exist"
-      msid="6.2.18"
-      impact="If a user is assigned a duplicate user name, it will create and have access to files with the first UID for that username in `/etc/passwd` . For example, if 'test4' has a UID of 1000 and a subsequent 'test4' entry has a UID of 2000, logging in as 'test4' will use UID 1000. Effectively, the UID is shared, which is a security problem."
-      remediation="Establish unique user names for the users. File ownerships will automatically reflect the change as long as the users have unique UIDs."
-      ruleId="017e0242-25b9-2c72-7ac6-d601086f5c8b">
-      <check distro="*" command="CheckNoDuplicateAccounts" path="/etc/passwd" variable="0"/>
-    </audit>
-    <audit
-      description="Ensure no duplicate groups exist"
-      msid="6.2.19"
-      impact="If a group is assigned a duplicate group name, it will create and have access to files with the first GID for that group in `/etc/group` . Effectively, the GID is shared, which is a security problem."
-      remediation="Establish unique names for the user groups. File group ownerships will automatically reflect the change as long as the groups have unique GIDs."
-      ruleId="bc5844b6-7e40-4f2f-7e81-1cbd18885dae">
-      <check distro="*" command="CheckNoDuplicateAccounts" path="/etc/group" variable="0"/>
-    </audit>
-    <audit
-      description="Ensure shadow group is empty"
-      msid="6.2.20"
-      impact="Any users assigned to the shadow group would be granted read access to the /etc/shadow file. If attackers can gain read access to the `/etc/shadow` file, they can easily run a password cracking program against the hashed passwords to break them. Other security information that is stored in the `/etc/shadow` file (such as expiration) could also be useful to subvert additional user accounts."
-      remediation="Remove all users form the shadow group"
-      ruleId="cbdc33fa-0f1c-0a90-7fe9-8ef1cf6643c2">
-      <check distro="*" command="CheckNoMatchingLines" path="/etc/group" regex="^shadow:.*:.*:\S+"/>
-    </audit>
+
     <audit
       description = "Disable the installation and use of file systems that are not required (hfs)"
       msid="6.3"
@@ -348,6 +82,7 @@
       ruleId="39595d95-88a4-78e2-6e0e-fbde7fd95eed">
       <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+hfs\s+/bin/true" path="/etc/modprobe.d/"/>
     </audit>
+
     <audit
       description = "Disable the installation and use of file systems that are not required (hfsplus)"
       msid="6.4"
@@ -357,6 +92,7 @@
       ruleId="68fb9c92-1009-9e24-694e-3d996a5e09c5">
       <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+hfsplus\s+/bin/true" path="/etc/modprobe.d/"/>
     </audit>
+
     <audit
       description = "Disable the installation and use of file systems that are not required (jffs2)"
       msid="6.5"
@@ -366,6 +102,7 @@
       ruleId="859c7aa0-6eeb-6aac-6160-2fdead2537bf">
       <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+jffs2\s+/bin/true" path="/etc/modprobe.d/"/>
     </audit>
+
     <audit
       description="Kernels should only be compiled from approved sources."
       msid="10"
@@ -376,27 +113,30 @@
       ruleId="34e19f66-2387-4cdc-8ab2-cfac8e5865f0">
       <check distro="Ubuntu" command="VerifyKernelSource" regex="-Ubuntu "/>
     </audit>
+
     <audit
       description = "/etc/shadow file permissions should be set to 0400"
       msid="11.1"
       cceid="CCE-4130-1"
       severity="Critical"
-      impact="An attacker that can retrieve or manipulate hashed passwords from /etc/shadow if it is not correctly secured."
+      impact="An attacker can retrieve or manipulate hashed passwords from /etc/shadow if it is not correctly secured."
       remediation="Set the permissions and ownership of /etc/shadow* or run '/opt/microsoft/omsagent/plugin/omsremediate -r set-etc-shadow-perms'"
       ruleId="13dabe7c-02ea-09d2-1a97-42cc7ac94eaa">
       <check distro="*" command="CheckFileStats" path="/etc/shadow" owner="root" group="root,shadow" mode-mask="07177"/>
     </audit>
+
     <audit
       description = "/etc/shadow- file permissions should be set to 0400"
       msid="11.2"
       cceid="CCE-4130-1"
       severity="Critical"
-      impact="An attacker that can retrieve or manipulate hashed passwords from /etc/shadow- if it is not correctly secured."
+      impact="An attacker can retrieve or manipulate hashed passwords from /etc/shadow- if it is not correctly secured."
       remediation="Set the permissions and ownership of /etc/shadow* or run '/opt/microsoft/omsagent/plugin/omsremediate -r set-etc-shadow-perms'"
       ruleId="1e941132-a3a7-5ccb-1817-50551b65202e">
       <check distro="*" command="CheckFileStats" path="/etc/shadow-" owner="root" group="root,shadow" mode-mask="07177"/>
       <check distro="*" command="CheckFileStatsIfExists" path="/etc/shadow.old" owner="root" group="root,shadow" mode-mask="07177"/>
     </audit>
+
     <audit
       description = "/etc/gshadow file permissions should be set to 0400"
       msid="11.3"
@@ -407,6 +147,7 @@
       ruleId="0a7f2b28-8586-6cef-512e-a28f991d83cd">
       <check distro="*" command="CheckFileStatsIfExists" path="/etc/gshadow-" owner="root" group="root,shadow" mode-mask="07177"/>
     </audit>
+
     <audit
       description = "/etc/gshadow- file permissions should be set to 0400"
       msid="11.4"
@@ -417,6 +158,7 @@
       ruleId="0fe59dec-472c-4b11-a221-36053a47afb6">
       <check distro="*" command="CheckFileStatsIfExists" path="/etc/gshadow" owner="root" group="root,shadow" mode-mask="07177"/>
     </audit>
+
     <audit
       description="/etc/passwd file permissions should be 0644"
       msid="12.1"
@@ -427,6 +169,7 @@
       ruleId="ad534c97-1070-415c-9fc7-c92366d3fc30">
       <check distro="*" command="CheckFileStats" path="/etc/passwd" owner="root" group="root" mode="644" allow-stricter="true" />
     </audit>
+
     <audit
       description="/etc/group file permissions should be 0644"
       msid="12.2"
@@ -437,16 +180,18 @@
       ruleId="c41a47e9-1ba0-4e72-9f43-4659a4bfed63">
       <check distro="*" command="CheckFileStats" path="/etc/group" owner="root" group="root" mode="644" allow-stricter="true" />
     </audit>
+
     <audit
-      description = "/etc/passwd- file permissions should be set to 0600"
+      description = "/etc/passwd- file permissions should be set to 0644"
       msid="12.3"
       cceid="CCE-3932-1"
       severity="Critical"
       impact="An attacker could join security groups if this file is not properly secured"
       remediation="Set the permissions and ownership of /etc/passwd- or run '/opt/microsoft/omsagent/plugin/omsremediate -r set-etc-passwd-perms"
       ruleId="0c67cac0-1e99-8a8f-32e1-841d18b01a9a">
-      <check distro="*" command="CheckFileStatsIfExists" path="/etc/passwd-" owner="root" group="root,shadow" mode="600"/>
+      <check distro="*" command="CheckFileStatsIfExists" path="/etc/passwd-" owner="root" group="root,shadow" mode="644" allow-stricter="true"/>
     </audit>
+
     <audit
       description="/etc/group- file permissions should be 0644"
       msid="12.4"
@@ -457,6 +202,7 @@
       ruleId="865ebb92-8e64-4e3a-aa9b-0290768aa8f1">
       <check distro="*" command="CheckFileStats" path="/etc/group-" owner="root" group="root" mode="644" allow-stricter="true" />
     </audit>
+
     <audit
       description = "Access to the root account via su should be restricted to the 'root' group"
       msid="21"
@@ -467,6 +213,7 @@
       ruleId="0c77cac0-1e99-8a8f-32e1-841d18b01a9a">
       <check distro="*" command="CheckMatchingLines" regex="^[\s\t]*auth\s+required\s+pam_wheel.so(\s+.*)?\suse_uid" path="/etc/pam.d/su"/>
     </audit>
+
     <audit
       description="The 'root' group should exist, and contain all members who can su to root"
       msid="22"
@@ -477,8 +224,9 @@
       ruleId="8cac0c32-1add-42b9-9300-5ccb9f91aab3">
       <check distro="*" command="CheckMatchingLines" regex="^root:x:0:" path="/etc/group" />
     </audit>
+
     <audit
-      description="There are no accounts without passwords"
+      description="All accounts should have a password"
       msid="23.2"
       cceid="CCE-4238-2"
       severity="Critical"
@@ -487,6 +235,7 @@
       ruleId="ca9d29b7-79bd-4c99-85e2-1454295c3c8e">
       <check distro="*" command="CheckNoMatchingLines" regex="^[^:]+::" path="/etc/shadow" />
     </audit>
+
     <audit
       description="Accounts other than root must have unique UIDs greater than zero(0)"
       msid="24"
@@ -497,6 +246,7 @@
       ruleId="7de0f0e6-f97b-4e12-8f9e-c6538ca5a85b">
       <check distro="*" command="CheckNoMatchingLines" filter="^root" regex="^[^:]:[^:]:0:" path="/etc/shadow" />
     </audit>
+
     <audit
       description="Randomized placement of virtual memory regions should be enabled"
       msid="25"
@@ -507,6 +257,7 @@
       ruleId="d790e942-efd3-42e6-a3a5-9eb1d651a588">
       <check distro="*" command="CheckMatchingLines" regex="^(1|2)$" path="/proc/sys/kernel/randomize_va_space" />
     </audit>
+
     <audit
       description="Kernel support for the XD/NX processor feature should be enabled"
       msid="26"
@@ -517,8 +268,9 @@
       ruleId="49c89437-d116-4d84-a91d-0dd59daafa0d">
       <check distro="*" command="CheckMatchingLines" regex="^\s*flags.* nx[ $]" path="/proc/cpuinfo" />
     </audit>
+
     <audit
-      description = " The '.' should not appear in root's $PATH"
+      description = "The '.' should not appear in root's $PATH"
       msid="27.1"
       cceid="CCE-3301-9"
       severity="Critical"
@@ -527,6 +279,7 @@
       ruleId="d66f8908-7b9f-77fc-18d4-af85197e0aeb">
       <check distro="*" command="CheckNotMatchEnvVariable" user="root" regex="^\.:|:\.:|:\.$" variable="PATH"/>
     </audit>
+
     <audit
       description = "User home directories should be mode 750 or more restrictive"
       msid="28"
@@ -537,6 +290,7 @@
       ruleId="0754488a-75c7-a4e8-0fb4-9212f771623f">
       <check distro="*" command="CheckHomeDirectoryPermissions"/>
     </audit>
+
     <audit
       description = "The default umask for all users should be set to 077 in login.defs"
       msid="29"
@@ -547,6 +301,7 @@
       ruleId="0753438a-75c7-a4e8-0fb4-9213f771623f">
       <check distro="*" command="CheckMatchingLines" regex="^UMASK\s+077" path="/etc/login.defs"/>
     </audit>
+
     <audit
       description="All bootloaders should have password protection enabled."
       msid="31"
@@ -559,6 +314,7 @@
       <check distro="*" command="CheckMatchingLinesIfExists" regex="^[\s]*password(?:(?:_pbkdf2\s+\S+)|(?:\s+--encrypted))\s+\S+" path="/boot/grub/grub.cfg"/>
       <check distro="*" command="CheckMatchingLinesIfExists" regex="^[\s]*password(?:(?:_pbkdf2\s+\S+)|(?:\s+--encrypted))\s+\S+" path="/boot/grub2/grub.cfg"/>
     </audit>
+
     <audit
       description="Ensure permissions on bootloader config are configured"
       msid="31.1"
@@ -570,14 +326,16 @@
       <check distro="*" command="CheckFileStatsIfExists" path="/boot/grub/grub.cfg" owner="root" group="root" mode="400" allow-stricter="true"/>
       <check distro="*" command="CheckFileStatsIfExists" path="/boot/grub2/grub.cfg" owner="root" group="root" mode="400" allow-stricter="true"/>
     </audit>
+
     <audit
       description="Ensure authentication required for single user mode."
       msid="33"
       impact="Requiring authentication in single user mode prevents an unauthorized user from rebooting the system into single user to gain root privileges without credentials."
       remediation="run the following command to set a password for the root user: `passwd root`"
-		  ruleId="13a48ca1-92bc-63a1-a4de-b984375fa332">
+      ruleId="13a48ca1-92bc-63a1-a4de-b984375fa332">
       <check distro="*" command="CheckNoMatchingLines" path="/etc/shadow" regex="^root:\s*:"/>
     </audit>
+
     <audit
       description="Ensure packet redirect sending is disabled."
       msid="38.3"
@@ -589,21 +347,23 @@
       <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv4\.conf\.all\.send_redirects\s*=\s*0\s*$"/>
       <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv4\.conf\.default\.send_redirects\s*=\s*0\s*$"/>
     </audit>
+
     <audit
-      description = "Sending ICMP redirects should be disabled for all interfaces. (net.ipv4.conf.default.accept_redirects = 0)"
+      description = "Sending ICMP redirects should be disabled for all interfaces. (net.ipv4.conf.default.accept_redirects = 0) and (net.ipv4.conf.all.accept_redirects = 0)"
       msid="38.4"
       cceid="CCE-4186-3"
       severity="Critical"
       impact="An attacker could alter this system's routing table, redirecting traffic to an alternate destination"
       remediation="Run `sysctl -w key=value` and set to a compliant value or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-accept-redirects'."
       ruleId="a492f72a-6b79-8a9d-3b4f-3fface972ab7">
-      <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv4\.conf\.default\.accept_redirects\s*=\s*0\s*$"/>
       <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv4\.conf\.all\.accept_redirects\s*=\s*0\s*$"/>
       <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv6\.conf\.all\.accept_redirects\s*=\s*0\s*$"/>
+      <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv4\.conf\.default\.accept_redirects\s*=\s*0\s*$"/>
       <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv6\.conf\.default\.accept_redirects\s*=\s*0\s*$"/>
     </audit>
+
     <audit
-      description = "Sending ICMP redirects should be disabled for all interfaces. (net.ipv4.conf.default.secure_redirects = 0)"
+      description = "Sending ICMP redirects should be disabled for all interfaces. (net.ipv4.conf.default.secure_redirects = 0) and (net.ipv4.conf.all.secure_redirects = 0)"
       msid="38.5"
       cceid="CCE-4151-7"
       severity="Critical"
@@ -613,18 +373,20 @@
       <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv4\.conf\.default\.secure_redirects\s*=\s*0\s*$"/>
       <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv4\.conf\.all\.secure_redirects\s*=\s*0\s*$"/>
     </audit>
+
     <audit
       description="Accepting source routed packets should be disabled for all interfaces. (net.ipv4.conf.all.accept_source_route = 0)"
       msid="40.1"
       cceid="CCE-4236-6"
       severity="Critical"
       impact="An attacker could redirect traffic for malicious purposes."
-      remediation="Run `sysctl -w key=value` and set to a compliant value or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-accept-source-route'"
+      remediation="Run `sysctl -w key=value` and set to a compliant value."
       ruleId="4ecae4e6-a3e2-44f5-9985-ea2a21962450">
       <check distro="*" command="CheckMatchingLines" regex="^0$" path="/proc/sys/net/ipv4/conf/all/accept_source_route" />
     </audit>
-     <audit
-      description="Accepting source routed packets should be disabled for all interfaces. (net.ipv6.conf.all.accept_source_route = 0) or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-accept-source-route'"
+
+    <audit
+      description="Accepting source routed packets should be disabled for all interfaces. (net.ipv6.conf.all.accept_source_route = 0)"
       msid="40.2"
       cceid="CCE-4236-6"
       severity="Critical"
@@ -633,6 +395,29 @@
       ruleId="b659c9f6-a076-4886-9048-db10c349b9fe">
       <check distro="*" command="CheckMatchingLinesIfExists" regex="^0$" path="/proc/sys/net/ipv6/conf/all/accept_source_route" />
     </audit>
+
+    <audit
+      description = "The default setting for accepting source routed packets should be disabled for network interfaces. (net.ipv4.conf.default.accept_source_route = 0)"
+      msid="42.1"
+      cceid="CCE-4091-5"
+      severity="Critical"
+      impact="An attacker could redirect traffic for malicious purposes."
+      remediation="Run `sysctl -w key=value` and set to a compliant value."
+      ruleId="63613c25-8ae1-4792-9572-02bdc941febf">
+      <check distro="*" command="CheckMatchingLinesIfExists" regex="^0$" path="/proc/sys/net/ipv4/conf/default/accept_source_route" />
+    </audit>
+
+    <audit
+      description = "The default setting for accepting source routed packets should be disabled for network interfaces. (net.ipv6.conf.default.accept_source_route = 0)"
+      msid="42.2"
+      cceid="CCE-4091-5"
+      severity="Critical"
+       impact="An attacker could redirect traffic for malicious purposes."
+      remediation="Run `sysctl -w key=value` and set to a compliant value."
+      ruleId="e0b5cd14-6953-4cb9-9f79-2957445686cf">
+      <check distro="*" command="CheckMatchingLinesIfExists" regex="^0$" path="/proc/sys/net/ipv6/conf/default/accept_source_route" />
+    </audit>
+
     <audit
       description="Ignoring bogus ICMP responses to broadcasts should be enabled. (net.ipv4.icmp_ignore_bogus_error_responses = 1)"
       msid="43"
@@ -643,6 +428,7 @@
       ruleId="88acc143-2f76-4418-9aa9-d0d5f244ab5f">
       <check distro="*" command="CheckMatchingLines" regex="^1$" path="/proc/sys/net/ipv4/icmp_ignore_bogus_error_responses" />
     </audit>
+
     <audit
       description="Ignoring ICMP echo requests (pings) sent to broadcast / multicast addresses should be enabled. (net.ipv4.icmp_echo_ignore_broadcasts = 1)"
       msid="44"
@@ -653,8 +439,9 @@
       ruleId="f5a5926d-9c64-41fa-8220-5bc0f8213550">
       <check distro="*" command="CheckMatchingLines" regex="^1$" path="/proc/sys/net/ipv4/icmp_echo_ignore_broadcasts" />
     </audit>
+
     <audit
-      description = "Logging of martian packets (those with impossible addresses) should be enabled for all interfaces. (net.ipv4.conf.all.log_martians = 1)"
+      description = "Logging of martian packets (those with impossible addresses) should be enabled for all interfaces. (net.ipv4.conf.all.log_martians = 1) and (net.ipv4.conf.default.log_martians = 1)"
       msid="45.1"
       cceid="CCE-4320-8"
       severity="Critical"
@@ -664,6 +451,7 @@
       <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv4\.conf\.all\.log_martians\s*=\s*1\s*$"/>
       <check distro="*" command="CheckSysctlOutput" regex="^net\.ipv4\.conf\.default\.log_martians\s*=\s*1\s*$"/>
     </audit>
+
     <audit
       description="Performing source validation by reverse path should be enabled for all interfaces. (net.ipv4.conf.all.rp_filter = 1)"
       msid="46.1"
@@ -674,6 +462,7 @@
       ruleId="177e6190-1026-49fb-a1f9-fd5b10302280">
       <check distro="*" command="CheckMatchingLines" regex="^1$" path="/proc/sys/net/ipv4/conf/all/rp_filter" />
     </audit>
+
     <audit
       description="Performing source validation by reverse path should be enabled for all interfaces. (net.ipv4.conf.default.rp_filter = 1)"
       msid="46.2"
@@ -684,8 +473,9 @@
       ruleId="c28d5519-6e3a-466f-8d8c-b351851dfc78">
       <check distro="*" command="CheckMatchingLines" regex="^1$" path="/proc/sys/net/ipv4/conf/default/rp_filter" />
     </audit>
+
     <audit
-      description="TCP syncookies should be enabled. (net.ipv4.tcp_syncookies = 1)"
+      description="TCP SYN cookies should be enabled. (net.ipv4.tcp_syncookies = 1)"
       msid="47"
       cceid="CCE-4265-5"
       severity="Critical"
@@ -694,6 +484,7 @@
       ruleId="db6ca14e-26c5-48cd-a6b7-fc953861043c">
       <check distro="*" command="CheckMatchingLines" regex="^1$" path="/proc/sys/net/ipv4/tcp_syncookies" />
     </audit>
+
     <audit
       description="The system should not act as a network sniffer."
       msid="48"
@@ -704,6 +495,7 @@
       ruleId="45766f27-5af3-453d-bade-f8195925cde1">
       <check distro="*" command="CheckNoPromiscInterfaces" />
     </audit>
+
     <audit
       description="All wireless interfaces should be disabled."
       msid="49"
@@ -714,6 +506,7 @@
       ruleId="8def2d0c-303a-4c0b-858c-319f80f7c814">
       <check distro="*" command="CheckNoWirelessInterfaces" />
     </audit>
+
     <audit
       description="The IPv6 protocol should be enabled."
       msid="50"
@@ -724,6 +517,7 @@
       ruleId="f04b1de8-1fd3-40da-a27f-39b7ea97bf8c">
       <check distro="*" command="CheckFileExists" path="/proc/net/if_inet6" />
     </audit>
+
     <audit
       description="Ensure DCCP is disabled"
       msid="54"
@@ -732,14 +526,16 @@
       ruleId="93d2736e-7329-8806-3ef6-e71bb2203d11">
       <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+dccp\s+/bin/true" path="/etc/modprobe.d/"/>
     </audit>
+
     <audit
       description="Ensure SCTP is disabled"
       msid="55"
       impact="If the protocol is not required, it is recommended that the drivers not be installed to reduce the potential attack surface."
       remediation="Edit or create a file in the `/etc/modprobe.d/` directory ending in .conf and add `install sctp /bin/true` then unload the sctp module or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-unnecessary-kernel-mods'"
       ruleId="78228616-15d4-33fe-0357-88e77f228f05">
-     <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+sctp\s+/bin/true" path="/etc/modprobe.d/"/>
+      <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+sctp\s+/bin/true" path="/etc/modprobe.d/"/>
     </audit>
+
     <audit
       description="Disable support for RDS."
       msid="56"
@@ -750,22 +546,16 @@
       ruleId="d9ed5e76-2348-4409-94dd-c76352407fe8">
       <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+rds\s+/bin/true" path="/etc/modprobe.d/" />
     </audit>
+
     <audit
       description="Ensure TIPC is disabled"
       msid="57"
       impact="If the protocol is not required, it is recommended that the drivers not be installed to reduce the potential attack surface."
       remediation="Edit or create a file in the `/etc/modprobe.d/` directory ending in .conf and add `install tipc /bin/true` then unload the tipc module or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-unnecessary-kernel-mods'"
       ruleId="8ace9b14-820f-6e0d-37d8-c6df950454cd">
-     <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+tipc\s+/bin/true" path="/etc/modprobe.d/"/>
+      <check distro="*" command="CheckMatchingLinesInDir" regex="^install\s+tipc\s+/bin/true" path="/etc/modprobe.d/"/>
     </audit>
-    <audit
-      description="Ensure logging is configured"
-      msid="60"
-      impact="A great deal of important security-related information is sent via `rsyslog` (for example, successful and failed su attempts, failed login attempts, root login attempts, etc.)."
-      remediation="Configure syslog, rsyslog or syslog-ng as appropriate"
-      ruleId="15ca11bf-034a-56d6-564f-2f857d1f96c6">
-      <check distro="*" command="CheckFileExistsRegex" path="/var/log" regex="(syslog|\S+\.log$)"/>
-    </audit>
+
     <audit
       description="The syslog, rsyslog, or syslog-ng package should be installed."
       msid="61"
@@ -774,8 +564,26 @@
       impact="Reliability and security issues will not be logged, preventing proper diagnosis."
       remediation="Install the rsyslog package, or run '/opt/microsoft/omsagent/plugin/omsremediate -r install-rsyslog'"
       ruleId="8720959b-c356-4eaa-bb4f-720fb8006183">
-      <check distro="*" command="CheckPackageInstalledRegexp" packagename="^r?syslog(-ng)?$" />
+      <check distro="*" command="CheckPackageInstalledRegexp" packagename="^r?syslog(-ng)?$">
+        <dependency type="PackageNotInstalled">systemd</dependency>
+      </check>
     </audit>
+
+    <audit
+      description="The systemd-journald service should be configured to persists log messages"
+      msid="61.1"
+      severity="Important"
+      impact="Reliability and security issues will not be logged, preventing proper diagnosis."
+      remediation="Create /var/log/journal and ensure that Storage in journald.conf is auto or persistent"
+      ruleId="7b3aa0e4-0464-4a0e-a265-9a585c4f266e">
+      <check distro="*" command="CheckNoMatchingLines" regex="^Storage\s+=\s+(volatile|none)" path="/etc/systemd/journald.conf">
+        <dependency type="PackageInstalled">systemd</dependency>
+      </check>
+      <check distro="*" command="CheckFileStats" path="/var/log/journal" owner="root" mode="2775" file-type="dir" allow-stricter="true">
+        <dependency type="PackageInstalled">systemd</dependency>
+      </check>
+    </audit>
+
     <audit
       description="Ensure a logging service is enabled"
       msid="62"
@@ -784,53 +592,53 @@
       ruleId="4c4e42e2-4cd2-3eaf-147b-ea4f61164d3e">
       <check distro="*" command="CheckServiceStatus" service="rsyslog" expect="running">
         <dependency type="PackageNotInstalled">syslog-ng</dependency>
+        <dependency type="PackageNotInstalled">systemd</dependency>
       </check>
       <check distro="*" command="CheckServiceStatus" service="syslog-ng" expect="running">
         <dependency type="PackageNotInstalled">rsyslog</dependency>
+        <dependency type="PackageNotInstalled">systemd</dependency>
+      </check>
+      <check distro="*" command="CheckServiceStatus" service="systemd-journald" expect="running">
+        <dependency type="PackageInstalled">systemd</dependency>
       </check>
     </audit>
+
     <audit
       description="File permissions for all rsyslog log files should be set to 640 or 600."
       msid="63"
       cceid="CCE-18095-0"
       severity="Important"
-      impact="An attacker could cover up activity by manipulating logs"
+      impact="An attacker could hide activity by manipulating logs"
       remediation="Add the line '$FileCreateMode 0640' to the file '/etc/rsyslog.conf'"
       ruleId="fcc86485-487a-4644-87a0-f29f1b1cd28b">
       <check distro="*" command="CheckMatchingLinesIfExists" regex="^[\s]*.FileCreateMode\s+06[04]0" path="/etc/rsyslog.conf" />
       <check distro="*" command="CheckMatchingLinesIfExists" filter="^options\s*{" regex="perm\(06(4|0)0\);" path="/etc/syslog-ng/syslog-ng.conf" />
     </audit>
-    <audit
-      description="Ensure logger configuration files are restricted."
-      msid="63.1"
-      impact="It is important to ensure that log files exist and have the correct permissions to ensure that sensitive syslog data is archived and protected."
-      remediation="Set your logger's configuration files to 0640  or run '/opt/microsoft/omsagent/plugin/omsremediate -r logger-config-file-permissions'"
-      ruleId="afd57de2-4365-9949-79f7-f8e92c198746">
-      <check distro="*" command="CheckFileStatsIfExists" path="/etc/syslog-ng/syslog-ng.conf" mode="644"/>
-      <check distro="*" command="CheckFileStatsIfExists" path="/etc/rsyslog.conf" mode="644"/>
-    </audit>
+
     <audit
       description="All rsyslog log files should be owned by the adm group."
       msid="64"
       cceid="CCE-18240-2"
       severity="Important"
-      impact="An attacker could cover up activity by manipulating logs"
+      impact="An attacker could hide activity by manipulating logs"
       remediation="Add the line '$FileGroup adm' to the file '/etc/rsyslog.conf'"
       ruleId="c1d99621-913e-45f7-96e1-a60b1af83015">
-      <check distro="Ubuntu|Debian" command="CheckMatchingLines" regex="^[\s]*.FileGroup\s+adm" path="/etc/rsyslog.conf" />
+      <check distro="Ubuntu|Debian" command="CheckMatchingLinesIfExists" regex="^[\s]*.FileGroup\s+adm" path="/etc/rsyslog.conf" />
     </audit>
+
     <audit
       description="All rsyslog log files should be owned by the syslog user."
       msid="65"
       cceid="CCE-17857-4"
       severity="Important"
-      impact="An attacker could cover up activity by manipulating logs"
+      impact="An attacker could hide activity by manipulating logs"
       remediation="Add the line '$FileOwner syslog' to the file '/etc/rsyslog.conf' or run '/opt/microsoft/omsagent/plugin/omsremediate -r syslog-owner"
       ruleId="2830790c-5b3f-43cb-be6b-7572e441acc1">
       <check distro="*" command="CheckMatchingLines" regex="^[\s]*.FileOwner\s+syslog" path="/etc/rsyslog.conf">
         <dependency type="FileExists">/etc/rsyslog.conf</dependency>
       </check>
     </audit>
+
     <audit
       description="Rsyslog should not accept remote messages."
       msid="67"
@@ -839,8 +647,9 @@
       impact="An attacker could inject messages into syslog, causing a DoS or a distraction from other activity"
       remediation="Remove the lines '$ModLoad imudp' and '$ModLoad imtcp' from the file '/etc/rsyslog.conf'"
       ruleId="1e9567e1-d96d-4f90-be1a-0809947e789c">
-      <check distro="!SLES" command="CheckNoMatchingLines" regex="^[\s]*.ModLoad\s+im(udp|tcp)" path="/etc/rsyslog.conf" />
+      <check distro="!SLES" command="CheckNoMatchingLinesIfExists" regex="^[\s]*.ModLoad\s+im(udp|tcp)" path="/etc/rsyslog.conf" />
     </audit>
+
     <audit
       description="The logrotate (syslog rotater) service should be enabled."
       msid="68"
@@ -849,10 +658,14 @@
       impact="Logfiles could grow unbounded and consume all disk space"
       remediation="Install the logrotate package and confirm the logrotate cron entry is active (chmod 755 /etc/cron.daily/logrotate; chown root:root /etc/cron.daily/logrotate)"
       ruleId="2d2355e7-7b07-4c0e-a395-16499c27ae94">
-      <check distro="*" command="CheckFileExists" path="/etc/cron.daily/logrotate"/>
-      <check distro="Ubuntu|Debian|SLES|Centos" command="CheckFileStats" path="/etc/cron.daily/logrotate" owner="root" group="root" mode="755" allow-stricter="true" />
-      <check distro="CentOS|RedHat|Oracle" command="CheckFileStats" path="/etc/cron.daily/logrotate" owner="root" group="root" mode="700" allow-stricter="true" />
+      <check distro="*" command="CheckFileStats" path="/etc/cron.daily/logrotate" owner="root" group="root" mode="755" allow-stricter="true">
+        <dependency type="SystemDUnitNotExists">logrotate.timer</dependency>
+      </check>
+      <check distro="*" command="CheckServiceStatus" service="logrotate.timer" expect="running">
+        <dependency type="SystemDUnitExists">logrotate.timer</dependency>
+      </check>
     </audit>
+
     <audit
       description="The rlogin service should be disabled."
       msid="69"
@@ -863,6 +676,7 @@
       ruleId="f57ef648-bdaa-45a3-9e3a-f4649c48896f">
       <check distro="*" command="CheckNoMatchingLinesIfExists" regex="^[\s\t]*login" path="/etc/inetd.conf" />
     </audit>
+
     <audit
       description="Disable inetd unless required. (inetd)"
       msid="70.1"
@@ -873,6 +687,7 @@
       ruleId="a8a37e7f-9aae-41cf-8313-42d1f69506b9">
       <check distro="*" command="CheckServiceDisabled" service="inetd" />
     </audit>
+
     <audit
       description="Disable xinetd unless required. (xinetd)"
       msid="70.2"
@@ -883,6 +698,7 @@
       ruleId="1d9557b2-b58f-4f81-bde9-4f9b08a3b2f1">
       <check distro="*" command="CheckServiceDisabled" service="xinetd" />
     </audit>
+
     <audit
       description="Install inetd only if appropriate and required by your distro. Secure according to current hardening standards. (if required)"
       msid="71.1"
@@ -893,6 +709,7 @@
       ruleId="d6bcd055-26cf-416e-a395-a9169b79f74c">
       <check distro="*" command="CheckPackageNotInstalled" packagename="inetd" />
     </audit>
+
     <audit
       description="Install xinetd only if appropriate and required by your distro. Secure according to current hardening standards. (if required)"
       msid="71.2"
@@ -903,6 +720,7 @@
       ruleId="0552f68e-b759-4aa7-a211-d48b2f6d2117">
       <check distro="*" command="CheckPackageNotInstalled" packagename="xinetd" />
     </audit>
+
     <audit
       description="The telnet service should be disabled."
       msid="72"
@@ -913,6 +731,7 @@
       ruleId="0617b91c-2a28-42bd-b5b3-7562555b41ed">
       <check distro="*" command="CheckNoMatchingLinesIfExists" regex="^[\s\t]*telnet" path="/etc/inetd.conf" />
     </audit>
+
     <audit
       description="All telnetd packages should be uninstalled."
       msid="73"
@@ -923,6 +742,7 @@
       ruleId="6c716f88-a252-4fe9-9c5c-ba9236a80beb">
       <check distro="*" command="CheckPackageNotInstalledRegexp" packagename="[a-z-]*telnetd" />
     </audit>
+
     <audit
       description="The rcp/rsh service should be disabled."
       msid="74"
@@ -933,6 +753,7 @@
       ruleId="dda66a42-30d1-4621-9565-f09628ac8047">
       <check distro="*" command="CheckNoMatchingLinesIfExists" regex="^[\s\t]*shell" path="/etc/inetd.conf" />
     </audit>
+
     <audit
       description="The rsh-server package should be uninstalled."
       msid="77"
@@ -943,7 +764,8 @@
       ruleId="b256491f-f804-4c44-bfa4-057dd2f44c30">
       <check distro="*" command="CheckPackageNotInstalled" packagename="rsh-server" />
     </audit>
-     <audit
+
+    <audit
       description="The ypbind service should be disabled."
       msid="78"
       cceid="CCE-3705-1"
@@ -953,6 +775,7 @@
       ruleId="58f5187e-88bd-4f24-8570-2c295d5c93c6">
       <check distro="*" command="CheckServiceDisabled" service="nis" />
     </audit>
+
     <audit
       description="The nis package should be uninstalled."
       msid="79"
@@ -963,6 +786,7 @@
       ruleId="7da0b32e-ced5-42eb-aa1e-6df90281e59c">
       <check distro="*" command="CheckPackageNotInstalled" packagename="nis" />
     </audit>
+
     <audit
       description="The tftp service should be disabled."
       msid="80"
@@ -973,6 +797,7 @@
       ruleId="cb086aef-fec2-467f-a03b-627c00020926">
       <check distro="*" command="CheckNoMatchingLinesIfExists" regex="^[\s\t]*tftp" path="/etc/inetd.conf" />
     </audit>
+
     <audit
       description="The tftpd package should be uninstalled."
       msid="81"
@@ -983,16 +808,18 @@
       ruleId="ae9ce111-ef4d-4d34-8f76-fdc38263f153">
       <check distro="*" command="CheckPackageNotInstalled" packagename="tftpd" />
     </audit>
+
     <audit
       description="The readahead-fedora package should be uninstalled."
       msid="82"
       cceid="CCE-4421-4"
       severity="Informational"
-      impact="No substantial exposure, but also no substantial benefit"
+      impact="The package creates no substantial exposure, but also adds no substantial benefit."
       remediation="Uninstall the readahead-fedora package (apt-get remove readahead-fedora)"
       ruleId="dbae0d26-55e9-49d5-8782-86cb7412f99f">
       <check distro="*" command="CheckPackageNotInstalled" packagename="readahead-fedora" />
     </audit>
+
     <audit
       description="The bluetooth/hidd service should be disabled."
       msid="84"
@@ -1003,6 +830,7 @@
       ruleId="9f107bb8-eaf3-445d-acbb-7ab635b442e9">
       <check distro="*" command="CheckServiceDisabled" service="bluetooth" />
     </audit>
+
     <audit
       description="The isdn service should be disabled."
       msid="86"
@@ -1013,6 +841,7 @@
       ruleId="51ebf409-911a-4d92-9d3a-1e331e7e4b27">
       <check distro="*" command="CheckServiceDisabled" service="isdnutils-base" />
     </audit>
+
     <audit
       description="The isdnutils-base package should be uninstalled."
       msid="87"
@@ -1023,6 +852,7 @@
       ruleId="49e5cb77-6272-4323-9c19-01fca3e12b9a">
       <check distro="*" command="CheckPackageNotInstalled" packagename="isdnutils-base" />
     </audit>
+
     <audit
       description="The kdump service should be disabled."
       msid="88"
@@ -1033,18 +863,21 @@
       ruleId="290d7102-c4e3-4e88-863d-6ddc7e952a5a">
       <check distro="*" command="CheckServiceDisabled" service="kdump-tools" />
     </audit>
+
     <audit
       description="Zeroconf networking should be disabled."
       msid="89"
       cceid="CCE-14054-1"
       severity="Critical"
-      impact="An attacker could use abuse this to gain information on network systems, or spoof DNS requests due to flaws in its trust model"
+      impact="An attacker could abuse this to gain information on networked systems, or spoof DNS requests due to flaws in its trust model"
       remediation="For RedHat, CentOS, and Oracle: Add `NOZEROCONF=yes or no` to /etc/sysconfig/network. For all other distros: Remove any 'ipv4ll' entries in the file '/etc/network/interfaces' or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-zeroconf'"
       ruleId="083550af-f4fe-4e1a-a304-dac894d58908">
-      <check distro="and|!RedHat|!CentOS|!Oracle|!SLES" command="CheckNoMatchingLinesIfExists" regex="ipv4ll" path="/etc/network/interfaces" />
+      <check distro="and|!RedHat|!CentOS|!Oracle|!SLES|!AlmaLinux|!Rocky" command="CheckNoMatchingLinesIfExists" regex="ipv4ll" path="/etc/network/interfaces" />
       <!--Zeroconf not available on SLES-->
-      <check distro="RedHat|CentOS|Oracle" command="CheckMatchingLines" regex="^NOZEROCONF=\w+\s*$" path="/etc/sysconfig/network" />
+      <check distro="RedHat|CentOS|Oracle|AlmaLinux|Rocky" command="CheckMatchingLines" regex="^NOZEROCONF=\w+\s*$" path="/etc/sysconfig/network" />
+      <!--Zeroconf status unknown for Mariner -->
     </audit>
+
     <audit
       description="The crond service should be enabled."
       msid="90"
@@ -1054,8 +887,9 @@
       remediation="Install the cron package (apt-get install -y cron) and confirm the file '/etc/init/cron.conf' contains the line 'start on runlevel [2345]'"
       ruleId="80302f61-d760-4165-a92b-a789e579380f">
       <check distro="Ubuntu|Debian|SLES" command="CheckServiceEnabled" service="cron" />
-      <check distro="CentOS|RedHat|Oracle" command="CheckServiceEnabled" service="crond" />
+      <check distro="CentOS|RedHat|Oracle|Mariner|AlmaLinux|Rocky" command="CheckServiceEnabled" service="crond" />
     </audit>
+
     <audit
       description="File permissions for /etc/anacrontab should be set to root:root 600."
       msid="91"
@@ -1066,6 +900,7 @@
       ruleId="8199ae98-8d9c-4a26-88ca-e6d9b87d3644">
       <check distro="*" command="CheckFileStatsIfExists" path="/etc/anacrontab" owner="root" group="root" mode="600" allow-stricter="true" />
     </audit>
+
     <audit
       description="Ensure permissions on /etc/cron.d are configured."
       msid="93"
@@ -1074,6 +909,7 @@
       ruleId="efa30987-4c67-73f5-979f-cb50f79466de">
       <check distro="*" command="CheckFileStatsIfExists" path="/etc/cron.d" owner="root" group="root" mode="700" allow-stricter="true"/>
     </audit>
+
     <audit
       description="Ensure permissions on /etc/cron.daily are configured."
       msid="94"
@@ -1082,6 +918,7 @@
       ruleId="0cc35843-7687-60cf-5280-bb98cf9a87c2">
       <check distro="*" command="CheckFileStatsIfExists" path="/etc/cron.daily" owner="root" group="root" mode="700" allow-stricter="true"/>
     </audit>
+
     <audit
       description="Ensure permissions on /etc/cron.hourly are configured."
       msid="95"
@@ -1090,6 +927,7 @@
       ruleId="ecdce8a2-9986-5833-8211-baf1938c1940">
       <check distro="*" command="CheckFileStatsIfExists" path="/etc/cron.hourly" owner="root" group="root" mode="700" allow-stricter="true"/>
     </audit>
+
     <audit
       description="Ensure permissions on /etc/cron.monthly are configured."
       msid="96"
@@ -1098,6 +936,7 @@
       ruleId="b5e94c1f-4d12-8bde-4c5e-98c651bd4430">
       <check distro="*" command="CheckFileStatsIfExists" path="/etc/cron.monthly" owner="root" group="root" mode="700" allow-stricter="true"/>
     </audit>
+
     <audit
       description="Ensure permissions on /etc/cron.weekly are configured."
       msid="97"
@@ -1106,38 +945,8 @@
       ruleId="61417e01-8cc4-86ab-0e3b-867d42dea66d">
       <check distro="*" command="CheckFileStatsIfExists" path="/etc/cron.weekly" owner="root" group="root" mode="700" allow-stricter="true"/>
     </audit>
+
     <audit
-      description="Ensure at/cron is restricted to authorized users"
-      msid="98"
-      impact="On many systems, only the system administrator is authorized to schedule `cron` jobs. Using the `cron.allow` file to control who can run `cron` jobs enforces this policy. It is easier to manage an allow list than a deny list. In a deny list, you could potentially add a user ID to the system and forget to add it to the deny files."
-      remediation="replace /etc/cron.deny and /etc/at.deny with their respective `allow` files"
-      ruleId="7ac5f3c8-917b-548e-3138-c6e326a362fc">
-      <check distro="*" command="CheckFileNotExists" path="/etc/cron.deny"/>
-      <check distro="*" command="CheckFileNotExists" path="/etc/at.deny"/>
-      <check distro="*" command="CheckFileExists" path="/etc/cron.allow">
-        <dependency type="FileNotExists">/etc/at.allow</dependency>
-      </check>
-      <check distro="*" command="CheckFileExists" path="/etc/at.allow">
-        <dependency type="FileNotExists">/etc/cron.allow</dependency>
-      </check>
-    </audit>
-    <audit
-      description="Ensure remote login warning banner is configured properly."
-      msid="111"
-      impact="Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organization that owns the system and any monitoring policies that are in place. Displaying OS and patch level information in login banners also has the side effect of providing detailed system information to attackers attempting to target specific exploits of a system. Authorized users can easily get this information by running the `uname -a`command once they have logged in."
-      remediation="Remove any instances of \m \r \s and \v from the /etc/issue.net file"
-      ruleId="d8bba1aa-69e9-2caf-1632-72938ff6759a">
-      <check distro="*" command="CheckNoMatchingLines" path="/etc/issue.net" regex="\\m|\\r|\\s|\\v"/>
-    </audit>
-    <audit
-      description="Ensure local login warning banner is configured properly."
-      msid="111.1"
-      impact="Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organization that owns the system and any monitoring policies that are in place. Displaying OS and patch level information in login banners also has the side effect of providing detailed system information to attackers attempting to target specific exploits of a system. Authorized users can easily get this information by running the `uname -a`command once they have logged in."
-      remediation="Remove any instances of \m \r \s and \v from the /etc/issue file"
-      ruleId="14c168de-4508-a69d-0feb-2f1efe245a71">
-      <check distro="*" command="CheckNoMatchingLines" path="/etc/issue" regex="\\m|\\r|\\s|\\v"/>
-    </audit>
-     <audit
       description="The avahi-daemon service should be disabled."
       msid="114"
       cceid="CCE-4365-3"
@@ -1147,6 +956,7 @@
       ruleId="c3bf78d8-43a0-4768-b790-c940621057b6">
       <check distro="*" command="CheckServiceDisabled" service="avahi-daemon" />
     </audit>
+
     <audit
       description="The cups service should be disabled."
       msid="115"
@@ -1157,6 +967,7 @@
       ruleId="4854666c-061b-4945-8a25-19133b8d5c7d">
       <check distro="*" command="CheckServiceDisabled" service="cups" />
     </audit>
+
     <audit
       description="The isc-dhcpd service should be disabled."
       msid="116"
@@ -1168,6 +979,7 @@
       <check distro="*" command="CheckServiceDisabled" service="isc-dhcp-server" />
       <check distro="*" command="CheckServiceDisabled" service="dhcpd" />
     </audit>
+
     <audit
       description="The isc-dhcp-server package should be uninstalled."
       msid="117"
@@ -1178,6 +990,7 @@
       ruleId="660fa012-ca99-4314-a2a8-11728020bac7">
       <check distro="*" command="CheckPackageNotInstalled" packagename="isc-dhcp-server" />
     </audit>
+
     <audit
       description="The sendmail package should be uninstalled."
       msid="120"
@@ -1188,6 +1001,7 @@
       ruleId="43356a32-24bb-401c-9746-a27b2be668fa">
       <check distro="*" command="CheckPackageNotInstalled" packagename="sendmail" />
     </audit>
+
     <audit
       description="The postfix package should be uninstalled."
       msid="121"
@@ -1198,6 +1012,7 @@
       ruleId="f56bf32f-528f-48b3-9f82-62f5ff4e9787">
       <check distro="*" command="CheckPackageNotInstalled" packagename="postfix" />
     </audit>
+
     <audit
       description="Postfix network listening should be disabled as appropriate."
       msid="122"
@@ -1208,6 +1023,7 @@
       ruleId="d0cc4e35-70a1-4ee5-b572-3b969201562e">
       <check distro="*" command="CheckMatchingLinesIfExists" regex="^[\s\t]*inet_interfaces\s*=\s*localhost\s*$" path="/etc/postfix/main.cf" />
     </audit>
+
     <audit
       description="The ldap service should be disabled."
       msid="124"
@@ -1218,6 +1034,7 @@
       ruleId="b577b358-6ec9-4ed7-b0df-259e44713b16">
       <check distro="*" command="CheckPackageNotInstalled" packagename="slapd" />
     </audit>
+
     <audit
       description="The rpcgssd service should be disabled."
       msid="126"
@@ -1228,6 +1045,7 @@
       ruleId="9c11dc9f-ab7e-4c3f-923f-5a8fc4e97cb9">
       <check distro="*" command="CheckServiceDisabled" service="rpcgssd" />
     </audit>
+
     <audit
       description="The rpcidmapd service should be disabled."
       msid="127"
@@ -1238,17 +1056,30 @@
       ruleId="b600d670-5b01-4458-9143-8aa7cd25dadc">
       <check distro="*" command="CheckServiceDisabled" service="rpcidmapd" />
     </audit>
+
     <audit
       description="The portmap service should be disabled."
-      msid="129"
+      msid="129.1"
       cceid="CCE-4550-0"
       severity="Important"
       impact="An attacker could use a flaw in portmap to gain access"
       remediation="Disable the rpcbind service or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-rpcbind'"
       ruleId="f4a80328-1d67-45ed-b915-274d2e6c699e">
       <check distro="Debian|Ubuntu|Oracle|CentOS&lt;7|RedHat&lt;7|SLES=11" command="CheckServiceDisabled" service="rpcbind" />
-      <check distro="CentOS&gt;=7|RedHat&gt;=7|SLES&gt;11" command="CheckServiceDisabled" service="rpcbind.service,rpcbind.socket" />
+      <check distro="CentOS&gt;=7|RedHat&gt;=7|SLES&gt;11|Mariner|AlmaLinux|Rocky" command="CheckServiceDisabled" service="rpcbind.service,rpcbind.socket" />
     </audit>
+
+    <audit
+      description="The Network File System (NFS) service should be disabled."
+      msid="129.2"
+      cceid="CCE-4550-1"
+      severity="Important"
+      impact="An attacker could use nfs to mount shares and execute/copy files."
+      remediation="Disable the nfs service or run '/opt/microsoft/omsagent/plugin/omsremediate -r disable-nfs'"
+      ruleId="ee372ff3-9221-498b-b467-7406bf421168">
+      <check distro="*" command="CheckServiceDisabled" service="nfs-server" />
+    </audit>
+
     <audit
       description="The rpcsvcgssd service should be disabled."
       msid="130"
@@ -1259,6 +1090,7 @@
       ruleId="78963287-11b9-471b-9122-e6829e105989">
       <check distro="*" command="CheckNoMatchingLinesIfExists" regex="^[\s\t]*NEED_SVCGSSD\s*=\s*&quot;yes&quot;" path="/etc/inetd.conf" />
     </audit>
+
     <audit
       description="The named service should be disabled."
       msid="131"
@@ -1269,6 +1101,7 @@
       ruleId="361a6cb4-f761-426f-a9d0-9e82ec0b3285">
       <check distro="*" command="CheckServiceDisabled" service="bind9" />
     </audit>
+
     <audit
       description="The bind package should be uninstalled."
       msid="132"
@@ -1279,6 +1112,7 @@
       ruleId="696f915a-2733-42cd-9496-135718280bb9">
       <check distro="*" command="CheckPackageNotInstalled" packagename="bind9" />
     </audit>
+
     <audit
       description="The dovecot service should be disabled."
       msid="137"
@@ -1289,6 +1123,7 @@
       ruleId="b0b6cf96-bd8a-40c5-b051-4615078a0bf0">
       <check distro="*" command="CheckServiceDisabled" service="dovecot" />
     </audit>
+
     <audit
       description="The dovecot package should be uninstalled."
       msid="138"
@@ -1299,7 +1134,8 @@
       ruleId="9bd9ffdf-9a4b-4aff-816a-f365c7e7046b">
       <check distro="*" command="CheckPackageNotInstalled" packagename="dovecot-core" />
     </audit>
-     <audit
+
+    <audit
       description = "Ensure no legacy `+` entries exist in /etc/passwd"
       msid="156.1"
       cceid="CCE-4114-5"
@@ -1309,6 +1145,7 @@
       ruleId="cc627f0c-3b72-6cc9-36b0-d2a3957431f4">
       <check distro="*" command="CheckNoMatchingLines" regex="^\+:" path="/etc/passwd"/>
     </audit>
+
     <audit
       description = "Ensure no legacy `+` entries exist in /etc/shadow"
       msid="156.2"
@@ -1319,6 +1156,7 @@
       ruleId="1a102d2e-76db-5ccf-3580-ccda064e8df3">
       <check distro="*" command="CheckNoMatchingLines" regex="^\+:" path="/etc/shadow"/>
     </audit>
+
     <audit
       description = "Ensure no legacy `+` entries exist in /etc/group"
       msid="156.3"
@@ -1329,32 +1167,37 @@
       ruleId="b487e075-15b4-0df1-550f-d8d5edd78eb4">
       <check distro="*" command="CheckNoMatchingLines" regex="^\+:" path="/etc/group"/>
     </audit>
+
     <audit
       description="Ensure password expiration is 365 days or less."
       msid="157.1"
-      impact="The window of opportunity for an attacker to leverage compromised credentials or successfully compromise credentials via an online brute force attack is limited by the age of the password. Therefore, reducing the maximum age of a password also reduces an attacker's window of opportunity."
+      impact="Reducing the maximum age of a password also reduces an attacker's window of opportunity to leverage compromised credentials or successfully compromise credentials via an online brute force attack."
       remediation="Set the `PASS_MAX_DAYS` parameter to no more than 365 in `/etc/login.defs`  or run '/opt/microsoft/omsagent/plugin/omsremediate -r  configure-password-policy-max-days'"
       ruleId="6ee7250d-142f-57db-25d0-c58207135059">
       <check distro="*" command="CheckMatchingLines" path="/etc/login.defs" regex="^PASS_MAX_DAYS\s+[0-9]{1,2}$|[1-2][0-9]{1,2}$|3[0-5][0-9]$|3[0-6][0-5]$"/>
     </audit>
+
     <audit
       description="Ensure password expiration warning days is 7 or more."
       msid="157.2"
       impact="Providing an advance warning that a password will be expiring gives users time to think of a secure password. Users caught unaware may choose a simple password or write it down where it may be discovered."
       remediation="Set the `PASS_WARN_AGE` parameter to 7 in `/etc/login.defs`  or run '/opt/microsoft/omsagent/plugin/omsremediate -r configure-password-policy-warn-age'"
       ruleId="b7ac978f-0963-a61f-58ae-5cf84ab76b5d">
-      <check distro="*" command="CheckMatchingLines" path="/etc/login.defs" regex="^PASS_WARN_AGE\s+[0-9]{2,}$|[7-9][0-9]*$"/>
+      <check distro="*" command="CheckMatchingLines" path="/etc/login.defs" regex="^PASS_WARN_AGE\s+(:?[7-9]|[1-9][0-9]+)$"/>
     </audit>
+
     <audit
       description="Ensure password reuse is limited."
       msid="157.5"
-      impact="Forcing users not to reuse their past 5 passwords make it less likely that an attacker will be able to guess the password."
+      impact="Forcing users not to reuse their past 5 passwords makes it less likely that an attacker will be able to guess the password."
       remediation="Ensure the 'remember' option is set to at least 5 in either /etc/pam.d/common-password or both /etc/pam.d/password_auth and /etc/pam.d/system_auth  or run '/opt/microsoft/omsagent/plugin/omsremediate -r configure-password-policy-history'"
       ruleId="57bdeae2-863e-14fb-a463-d6ee64816b33">
-      <check distro="Ubuntu|Debian" command="CheckMatchingLines" path="/etc/pam.d/common-password" filter="^password\s+required\s+" regex="\s+remember=[5-9]+[0-9]*"/>
-      <check distro="CentOS|RedHat|Oracle" command="CheckMatchingLines" path="/etc/pam.d/password-auth" filter="^password\s+required\s+" regex="\s+remember=[5-9]+[0-9]*"/>
-      <check distro="CentOS|RedHat|Oracle" command="CheckMatchingLines" path="/etc/pam.d/system-auth" filter="^password\s+required\s+" regex="\s+remember=[5-9]+[0-9]*"/>
+      <check distro="Ubuntu|Debian" command="CheckMatchingLines" path="/etc/pam.d/common-password" filter="^password\s+required\s+" regex="\s+remember=(:?[5-9]+|[1-9][0-9]+)"/>
+      <check distro="CentOS|RedHat|Oracle|AlmaLinux|Rocky" command="CheckMatchingLines" path="/etc/pam.d/password-auth" filter="^password\s+required\s+" regex="\s+remember=(:?[5-9]+|[1-9][0-9]+)"/>
+      <check distro="CentOS|RedHat|Oracle|AlmaLinux|Rocky" command="CheckMatchingLines" path="/etc/pam.d/system-auth" filter="^password\s+required\s+" regex="\s+remember=(:?[5-9]+|[1-9][0-9]+)"/>
+      <check distro="Mariner" command="CheckMatchingLines" path="/etc/pam.d/system-password" filter="^password\s+required\s+" regex="\s+remember=(:?[5-9]+|[1-9][0-9]+)"/>
     </audit>
+
     <audit
       description="Ensure password hashing algorithm is SHA-512"
       msid="157.11"
@@ -1364,10 +1207,11 @@
 ```
 password sufficient pam_unix.so sha512
 ```"
-	    ruleId="01ec5346-882b-485d-8960-01dedd608792">
-      <check distro="*" command="CheckMatchingLinesInFiles" regex="sha512" filter="^password\s.*\s*pam_unix.so\s+\S+" path="/etc/pam.d/common-password|/etc/pam.d/system-auth" />
+      ruleId="01ec5346-882b-485d-8960-01dedd608792">
+      <check distro="*" command="CheckMatchingLinesInFiles" regex="sha512" filter="^password\s.*\s*pam_unix.so\s+\S+" path="/etc/pam.d/common-password|/etc/pam.d/system-auth|/etc/pam.d/system-password" />
       <check distro="*" command="CheckMatchingLines" regex="^ENCRYPT_METHOD\s+SHA512" path="/etc/login.defs" />
     </audit>
+
     <audit
       description="Ensure minimum days between password changes is 7 or more."
       msid="157.12"
@@ -1375,8 +1219,9 @@ password sufficient pam_unix.so sha512
       impact="By restricting the frequency of password changes, an administrator can prevent users from repeatedly changing their password in an attempt to circumvent password reuse controls."
       remediation="Set the `PASS_MIN_DAYS` parameter to 7 in `/etc/login.defs`: `PASS_MIN_DAYS 7`. Modify user parameters for all users with a password set to match: `chage --mindays 7`  or run '/opt/microsoft/omsagent/plugin/omsremediate -r set-pass-min-days'"
       ruleId="50272a84-672d-4c11-a67e-9d058adaf67a">
-      <check distro="*" command="CheckMatchingLines" regex="^\s*PASS_MIN_DAYS\s+([7-9]|[1-9][0-9]+)\s*$" path="/etc/login.defs" />
+      <check distro="*" command="CheckMatchingLines" regex="^\s*PASS_MIN_DAYS\s+(:?[7-9]|[1-9][0-9]+)\s*$" path="/etc/login.defs" />
     </audit>
+
     <audit
       description="Ensure all users last password change date is in the past"
       msid="157.14"
@@ -1391,9 +1236,10 @@ Modify user parameters for all users with a password set to match:
 ```
 # chage --inactive 30 
 ```"
-	    ruleId="91fbaeac-f5d0-4ac9-aa1b-52215aef1ed8">
+      ruleId="91fbaeac-f5d0-4ac9-aa1b-52215aef1ed8">
       <check distro="*" command="CheckShadowDate" key="2" expect="before" value="now" path="/etc/shadow" />
     </audit>
+
     <audit
       description="Ensure system accounts are non-login"
       msid="157.15"
@@ -1403,6 +1249,7 @@ Modify user parameters for all users with a password set to match:
       ruleId="448b668a-738c-420b-b332-51ea49922933">
       <check distro="*" command="CheckSystemAccounts" />
     </audit>
+
     <audit
       description="Ensure default group for the root account is GID 0"
       msid="157.16"
@@ -1415,6 +1262,7 @@ Modify user parameters for all users with a password set to match:
       ruleId="732fa92f-647e-47b8-b5a4-fdf00b02d9e2">
       <check distro="*" command="CheckMatchingLines" regex="^root:x:[0-9]+:0" path="/etc/passwd" />
     </audit>
+
     <audit
       description="Ensure root is the only UID 0 account"
       msid="157.18"
@@ -1424,16 +1272,7 @@ Modify user parameters for all users with a password set to match:
       ruleId="b5845ff3-42f4-4112-b2a2-5b827232a053">
       <check distro="*" command="CheckRootUID" path="/etc/passwd"/>
     </audit>
-    <audit
-      description="Remove unnecessary packages"
-      msid="158"
-      cceid="CCE-XXXXX-6"
-      severity="Informational"
-      impact=""
-      remediation="Run '/opt/microsoft/omsagent/plugin/omsremediate -r remove-landscape-common"
-      ruleId="29a14c8c-c7fe-4168-accf-ec224141ba65">
-      <check distro="Ubuntu" command="CheckPackageNotInstalled" packagename="landscape-common" />
-    </audit>
+
     <audit
       description="Remove unnecessary accounts"
       msid="159"
@@ -1444,30 +1283,7 @@ Modify user parameters for all users with a password set to match:
       ruleId="627b7494-0e62-4093-9f77-db8d526d036b">
       <check distro="Ubuntu" command="CheckNoMatchingLines" regex="^games:" path="/etc/passwd" />
     </audit>
-    <audit
-      description="Ensure auditd service is enabled"
-      msid="162"
-      cceid="CCE-4240-2"
-      severity="Critical"
-      impact="The capturing of system events provides system administrators with information to allow them to determine if unauthorized access to their system is occurring."
-      remediation="Install audit package (systemctl enable auditd)"
-      ruleId="f9fd03d2-75e4-4564-84a9-4e955f1e7c30">
-      <check distro="*" command="CheckServiceEnabled" service="auditd">
-      <dependency type="PackageInstalled">audit(?:d)?$</dependency>
-    </check>
-    </audit>
-    <audit
-      description="Run AuditD service"
-      msid="163"
-      cceid=" CCE-4240-3"
-      severity="Critical"
-      impact="The capturing of system events provides system administrators with information to allow them to determine if unauthorized access to their system is occurring."
-      remediation="Run AuditD service (systemctl start auditd)"
-      ruleId="c146c4a4-5eb6-4205-88da-5a71a82f2d45">
-      <check distro="*" command="CheckServiceEnabled"  expect="running" service="auditd">
-    	<dependency type="PackageInstalled">audit(?:d)?$</dependency>
-      </check>
-    </audit>
+
     <audit
       description="Ensure SNMP Server is not enabled"
       msid="179"
@@ -1486,6 +1302,7 @@ Modify user parameters for all users with a password set to match:
       ruleId="ca1aea32-3969-49ab-abfc-2c5796a9a8bb">
       <check distro="*" command="CheckServiceDisabled" service="snmpd" />
     </audit>
+
     <audit
       description="Ensure rsync service is not enabled"
       msid="181"
@@ -1495,11 +1312,12 @@ Modify user parameters for all users with a password set to match:
       ruleId="63aba603-b1f8-40df-82c5-38915452ce23">
       <check distro="*" command="CheckServiceDisabled" service="rsync" />
     </audit>
+
     <audit
       description="Ensure NIS server is not enabled"
       msid="182"
       severity="Warning"
-      impact="The NIS service is inherently an insecure system that has been vulnerable to DOS attacks, buffer overflows and has poor authentication for querying NIS maps. NIS generally been replaced by such protocols as Lightweight Directory Access Protocol (LDAP). It is recommended that the service be disabled and other, more secure services be used"
+      impact="The NIS service is an inherently insecure system that has been vulnerable to DOS attacks, buffer overflows and has poor authentication for querying NIS maps. NIS is generally replaced by protocols like Lightweight Directory Access Protocol (LDAP). It is recommended that the service be disabled and more secure services be used"
       remediation="Run one of the following commands to disable `ypserv` :
 ```
 # chkconfig ypserv off
@@ -1513,6 +1331,7 @@ Modify user parameters for all users with a password set to match:
       ruleId="b4ad3fdd-7b68-4b11-a3ed-84b37a68b995">
       <check distro="*" command="CheckServiceDisabled" service="ypserv" />
     </audit>
+
     <audit
       description="Ensure rsh client is not installed"
       msid="183"
@@ -1531,20 +1350,21 @@ zypper remove rsh
       ruleId="6d441f31-f888-4f4f-b1da-7cfc26263e3f">
       <check distro="*" command="CheckPackageNotInstalled" packagename="rsh" />
     </audit>
+
     <audit
       description="Disable SMB V1 with Samba"
       msid="185"
       severity="Critical"
-      impact="SMB v1 has well-known, serious vulnerabilities and does not encrypt data in transit. If it must be used for overriding business reasons, it is strongly recommended that other mitigations be identified to compensate for the use of this protocol. "
+      impact="SMB v1 has well-known, serious vulnerabilities and does not encrypt data in transit. If it must be used for business reasons, it is strongly recommended that additional steps be taken to mitigate the risks inherent to this protocol."
       remediation="If Samba is not running, remove package, otherwise there should be a line in the [global] section of /etc/samba/smb.conf: min protocol = SMB2 or run '/opt/microsoft/omsagent/plugin/omsremediate -r set-smb-min-version"
       ruleId="7624efb0-3026-4c72-8920-48d5be78a50e">
-      <check 
-      distro="*" 
-      command="CheckMatchingLinesSection" 
-      regex="\s*min protocol\s+=\s+SMB2" 
-      expect="^\s*\[global\]" 
-      path="/etc/samba/smb.conf" 
-      key="^\s*\[.+\]">
+      <check
+        distro="*"
+        command="CheckMatchingLinesSection"
+        regex="\s*min protocol\s+=\s+SMB2"
+        expect="^\s*\[global\]"
+        path="/etc/samba/smb.conf"
+        key="^\s*\[.+\]">
         <dependency type="ServiceStatus">samba|running</dependency>
       </check>
     </audit>
@@ -1554,103 +1374,39 @@ zypper remove rsh
     Remediations are preformed in the order they appear in this file.
     All actions in a remediation that match the distro are performed, and in the order they appear.
   -->
-  <remediation id="install-updates" msids="7" description="Install all available package updates">
-    <action distro="*" action="ActionUpdatePackageInfo"/>
-    <action distro="*" action="ActionInstallAvailableUpdates"/>
-  </remediation>
 
-  <remediation id="install-ntp" msids="118" description="Install the ntp service">
-    <action distro="*" action="ActionInstallPackage" package="ntp"/>
-    <action distro="Ubuntu|Debian|SLES=11" action="ActionEnableService" service="ntp"/>
-    <action distro="CentOS|RedHat|Oracle|SLES=12" action="ActionEnableService" service="ntpd"/>
-    <action distro="Ubuntu|Debian|SLES=11" action="ActionRestartService" service="ntp"/>
-    <action distro="CentOS|RedHat|Oracle|SLES=12" action="ActionRestartService" service="ntpd"/>
-  </remediation>
+    <remediation id="remove-postfix" msids="121" description="Remove the postfix package">
+      <action distro="*" action="ActionRemovePackage" package="postfix"/>
+    </remediation>
 
-  <remediation id="configure-ntp" msids="119" description="Configure the ntp service">
-    <action distro="!SLES" action="ActionScript">
-      <script>
-      <![CDATA[
-# (Audit 119) Configure ntpd
-if [ -z "$(egrep '^server\s+time.windows.com\s*$' /etc/ntp.conf)" ]; then
-    sed -i 's/^\([\s]*server\s\+\)0.*$/\1time.windows.com/g' /etc/ntp.conf
-    sed -i '/^[\s]*server\s\+[1-3].*$/d' /etc/ntp.conf
-fi
-      ]]>
-      </script>
-    </action>
-    <action distro="SLES" action="ActionScript">
-      <script>
-      <![CDATA[
-if [ -z "$(egrep '^server\s+time.windows.com\s*$' /etc/ntp.conf)" ]; then
-    sed -i 's/^\(restrict\s*::1\s*\)$/\1\n\nserver time.windows.com/g' /etc/ntp.conf
-fi
-      ]]>
-      </script>
-    </action>
-    <action distro="Ubuntu|Debian|SLES=11" action="ActionRestartService" service="ntp"/>
-    <action distro="CentOS|RedHat|Oracle|SLES=12" action="ActionRestartService" service="ntpd"/>
-  </remediation>
+    <remediation id="remove-landscape-common" msids="158" description="Ensure landscape-common is not installed">
+      <action distro="Ubuntu" action="ActionRemovePackage" package="landscape-common"/>
+    </remediation>
 
-  <remediation id="remove-at" msids="105" description="Remove atd service">
-    <action distro="*" action="ActionRemovePackage" package="at"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
-rm -fr /etc/init/atd.conf /etc/init.d/atd
-      ]]>
-      </script>
-    </action>
-  </remediation>
-
-  <remediation id="remove-postfix" msids="121" description="Remove the postfix package">
-    <action distro="*" action="ActionRemovePackage" package="postfix"/>
-  </remediation>
-  
-  <remediation id="bootloader-permissions" msids="31.1" description="Ensure permissions on bootloader config are set">
-    <action distro="*" action="ActionSetPerms" path="/boot/grub/grub.conf" name="root:root" value="0400"/>
-    <action distro="*" action="ActionSetPerms" path="/boot/grub/grub.cfg" name="root:root" value="0400"/>
-    <action distro="*" action="ActionSetPerms" path="/boot/grub2/grub.cfg" name="root:root" value="0400"/>
-  </remediation>
-  <remediation id="restart-ssh" msids="106.1,106.3,107,108,109,110,113,111" description="Restart ssh service">
-    <action distro="Ubuntu|Debian" action="ActionRestartService" service="ssh"/>
-    <action distro="CentOS|Redhat|Oracle|Sles" action="ActionRestartService" service="sshd"/>
-  </remediation>
-
-  <remediation id="restrict-root-login" msids="20" description="Restrict root login">
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
-echo -e "console\ntty1" > /etc/securetty
-      ]]>
-      </script>
-    </action>
-  </remediation>
-
-  <remediation id="fix-su-permissions" msids="21" description="Fix su permissions">
-    <action distro="!SLES" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="fix-su-permissions" msids="21" description="Fix su permissions">
+      <action distro="!SLES" action="ActionScript">
+        <script>
+        <![CDATA[
 sed -i 's/^#*\s*\(auth\s\+required\s\+pam_wheel.so\)\(\s\+use_uid\)\?$/\1 use_uid/g' /etc/pam.d/su
-      ]]>
-      </script>
-    </action>
-    <action distro="SLES" action="ActionScript">
-      <!-- This change isn't sufficient on SLES -->
-      <script>
-      <![CDATA[
+        ]]>
+        </script>
+      </action>
+      <action distro="SLES" action="ActionScript">
+        <!-- This change isn't sufficient on SLES -->
+        <script>
+        <![CDATA[
 if [ -z "$(egrep '^\s*auth\s+required\s+pam_wheel.so\s+use_uid\s*$' /etc/pam.d/su)" ]; then
     sed -i 's/\(\s*auth\s\+sufficient\s\+pam_rootok.so\s*\)$/\1\nauth required pam_wheel.so use_uid/g' /etc/pam.d/su
 fi
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="fix-home-dir-permissions" msids="28" description="Fix home dir permissions">
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="fix-home-dir-permissions" msids="28" description="Fix home dir permissions">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 chmod 750 /home/*
 if [ -e /var/lib/libuuid ]; then
     chmod 750 /var/lib/libuuid
@@ -1667,425 +1423,456 @@ fi
 if [ -e /etc/init/ssh.conf ]; then
   sed -i 's/\(mkdir\s\+-p\s\+-m\)[0-9]\{4\}/\10750/g' /etc/init/ssh.conf
 fi
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="set-default-user-umask" msids="29" description="Set default umask for all users to 077">
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="set-default-user-umask" msids="29" description="Set default umask for all users to 077">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 # (Audit 29) Set default umask to 077
 sed -i 's/^\(UMASK\s\+\)[0-9]\{3\}/\1077/g' /etc/login.defs
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="disable-ip-forward" msids="37" description="Disable IP forwarding">
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.ip_forward" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv6.conf.default.forwarding" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv6.conf.all.forwarding" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
-sysctl -w net.ipv4.ip_forward=0
+    <remediation id="disable-zeroconf" msids="89" description="Disable Zeroconf networking">
+      <action distro="Centos|RedHat|Oracle|AlmaLinux|Rocky" action="ActionEditConfig" name="NOZEROCONF" value="yes" value-regex="/w" sep="=" path="/etc/sysconfig/network"/>
+    </remediation>
 
-for i in $(sysctl -N net.ipv6.conf 2>/dev/null | egrep '^net\.ipv6\.conf\.[^\.]+\.forwarding')
-do
-    sysctl -w $i=0
-done
-      ]]>
-      </script>
-    </action>
-  </remediation>
 
-  <remediation id="disable-zeroconf" msids="89" description="Disable Zeroconf networking">
-    <action distro="Centos|RedHat|Oracle" action="ActionEditConfig" name="NOZEROCONF" value="yes" value-regex="/w" sep="=" path="/etc/sysconfig/network"/>
-  </remediation>
-
-  <remediation id="enable-tcp-syncookies" msids="47" description="Enable tcp_syncookies">
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.tcp_syncookies" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="enable-tcp-syncookies" msids="47" description="Enable tcp_syncookies">
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.tcp_syncookies" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 sysctl -w net.ipv4.tcp_syncookies=1
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="enable-rp-filter" msids="46.1,46.2" description="Enable reverse path filter">
-    <!-- TODO: Add ipv6 once that support gets added to the kernel. -->
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.rp_filter" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.rp_filter" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="enable-rp-filter" msids="46.1,46.2" description="Enable reverse path filter">
+      <!-- TODO: Add ipv6 once that support gets added to the kernel. -->
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.rp_filter" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.rp_filter" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 for i in $(sysctl -N net.ipv4.conf 2>/dev/null | egrep '^net\.ipv4\.conf\.[^\.]+\.rp_filter')
 do
     sysctl -w $i=1
 done
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="disable-accept-redirects" msids="38.1,38.4,38.8" description="Disable accept-redirects">
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.accept_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.accept_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv6.conf.default.accept_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv6.conf.all.accept_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+
+    <remediation id="disable-accept-redirects" msids="38.4" description="Disable accept-redirects">
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.accept_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.accept_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionEditConfig" name="net.ipv6.conf.default.accept_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionEditConfig" name="net.ipv6.conf.all.accept_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 for i in $(sysctl -N net 2>/dev/null | egrep '^net\.ipv[46]\.conf\.[^\.]+\.accept_redirects')
 do
     sysctl -w $i=0
 done
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="disable-secure-redirects" msids="38.2,38.5" description="Disable secure_redirects">
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.secure_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.secure_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="disable-secure-redirects" msids="38.5" description="Disable secure_redirects">
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.secure_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.secure_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 for i in $(sysctl -N net 2>/dev/null | egrep '^net\.ipv4\.conf\.[^\.]+\.secure_redirects')
 do
     sysctl -w $i=0
 done
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="disable-send-redirects" msids="38.3,38.6" description="Disable send_redirects">
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.send_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.send_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="disable-send-redirects" msids="38.3" description="Disable send_redirects">
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.send_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.send_redirects" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 for i in $(sysctl -N net 2>/dev/null | egrep '^net\.ipv4\.conf\.[^\.]+\.send_redirects')
 do
     sysctl -w $i=0
 done
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="disable-accept-source-route" msids="40.1,40.2,42.1,42.2" description="Disable accept_source_route">
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.accept_source_route" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.accept_source_route" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv6.conf.default.accept_source_route" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv6.conf.all.accept_source_route" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="disable-accept-source-route" msids="40.1,40.2,42.1,42.2" description="Disable accept_source_route">
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.accept_source_route" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.accept_source_route" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionEditConfig" name="net.ipv6.conf.default.accept_source_route" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionEditConfig" name="net.ipv6.conf.all.accept_source_route" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 for i in $(sysctl -N net 2>/dev/null | egrep '^net\.ipv[46]\.conf\.[^\.]+\.accept_source_route')
 do
     sysctl -w $i=0
 done
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="enable-log-martians" msids="45.1,45.2" description="Enable log_martians">
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.log_martians" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.log_martians" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="enable-log-martians" msids="45.1,45.2" description="Enable log_martians">
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.default.log_martians" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.conf.all.log_martians" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 for i in $(sysctl -N net 2>/dev/null | egrep '^net\.ipv4\.conf\.[^\.]+\.log_martians')
 do
     sysctl -w $i=1
 done
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="enable-icmp-ignore-bogus-error-responses" msids="43" description="Enable icmp_ignore_bogus_error_responses">
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.icmp_ignore_bogus_error_responses" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="enable-icmp-ignore-bogus-error-responses" msids="43" description="Enable icmp_ignore_bogus_error_responses">
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.icmp_ignore_bogus_error_responses" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 sysctl -w net.ipv4.icmp_ignore_bogus_error_responses=1
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="enable-icmp-echo-ignore-broadcasts" msids="44" description="Enable icmp_echo_ignore_broadcasts">
-    <action distro="*" action="ActionEditConfig" name="net.ipv4.icmp_echo_ignore_broadcasts" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="enable-icmp-echo-ignore-broadcasts" msids="44" description="Enable icmp_echo_ignore_broadcasts">
+      <action distro="*" action="ActionEditConfig" name="net.ipv4.icmp_echo_ignore_broadcasts" value="1" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 sysctl -w net.ipv4.icmp_echo_ignore_broadcasts=1
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="enable-password-requirements" msids="5.3.1" description="Ensure password creation requirements are configured">
-    <action distro="Ubuntu|Debian" action="ActionInstallPackage" package="libpam-pwquality"/>
-    <action distro="CentOS>6|RedHat>6|Oracle>6|Ubuntu|Debian" action="ActionEditConfig" path="/etc/security/pwquality.conf" name="minlen" sep=" = " value="14" value-regex="[1-9][0-9]*"/>
-    <action distro="CentOS>6|RedHat>6|Oracle>6|Ubuntu|Debian" action="ActionEditConfig" path="/etc/security/pwquality.conf" name="minclass" sep=" = " value="4" value-regex="[0-4]"/>
-  </remediation>
+    <remediation id="install-rsyslog" msids="61" description="Install rsyslog">
+      <action distro="*" action="ActionInstallPackage" package="rsyslog"/>
+    </remediation>
 
-  <remediation id="install-rsyslog" msids="61" description="Install rsyslog">
-    <action distro="*" action="ActionInstallPackage" package="rsyslog"/>
-  </remediation>
+    <remediation id="enable-rsyslog" msids="62" description="Enable rsyslog">
+      <action distro="!SLES=11" action="ActionEnableService" service="rsyslog"/>
+      <action distro="SLES=11" action="ActionEnableService" service="syslog"/>
+      <action distro="!SLES=11" action="ActionRestartService" service="rsyslog"/>
+      <action distro="SLES=11" action="ActionRestartService" service="syslog"/>
+    </remediation>
 
-  <remediation id="enable-rsyslog" msids="62" description="Enable rsyslog">
-    <action distro="!SLES=11" action="ActionEnableService" service="rsyslog"/>
-    <action distro="SLES=11" action="ActionEnableService" service="syslog"/>
-    <action distro="!SLES=11" action="ActionRestartService" service="rsyslog"/>
-    <action distro="SLES=11" action="ActionRestartService" service="syslog"/>
-  </remediation>
-
-  <remediation id="configure-syslog-file-create-mode" msids="63" description="Configure rsyslog $FileCreateMode">
-    <action distro="CentOS|RedHat|Oracle" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="configure-syslog-file-create-mode" msids="63" description="Configure rsyslog $FileCreateMode">
+      <action distro="CentOS|RedHat|Oracle|AlmaLinux|Rocky" action="ActionScript">
+        <script>
+        <![CDATA[
 if [ -z "$(egrep '^\s*$FileCreateMode' /etc/rsyslog.conf 2>&1)" ]; then
     sed -i 's/^\(.*GLOBAL DIRECTIVES.*\)$/\1\n\$FileCreateMode 0640/g' /etc/rsyslog.conf
 fi
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="syslog-owner" msids="65" description="Ensure rsyslog files are owned by the syslog user">
-    <action distro="*" action="ActionEditConfig" name="$FileOwner" name-regex="\$FileOwner" value="syslog" value-regex="\w+" path="/etc/rsyslog.conf"/>
-  </remediation>
+    <remediation id="syslog-owner" msids="65" description="Ensure rsyslog files are owned by the syslog user">
+      <action distro="*" action="ActionEditConfig" name="$FileOwner" name-regex="\$FileOwner" value="syslog" value-regex="\w+" path="/etc/rsyslog.conf"/>
+    </remediation>
 
-  <remediation id="set-etc-shadow-perms" msids="11.1,11.2" description="Set permissions on /etc/shadow">
-    <action distro="*" action="ActionSetPerms" path="/etc/shadow" name="root:" value="0400"/>
-    <action distro="*" action="ActionSetPerms" path="/etc/shadow.old" name="root:" value="0400"/>
-    <action distro="*" action="ActionSetPerms" path="/etc/shadow-" name="root:" value="0400"/>
-  </remediation>
+    <remediation id="set-etc-shadow-perms" msids="11.1,11.2" description="Set permissions on /etc/shadow">
+      <action distro="*" action="ActionSetPerms" path="/etc/shadow" name="root:" value="0400"/>
+      <action distro="*" action="ActionSetPerms" path="/etc/shadow.old" name="root:" value="0400"/>
+      <action distro="*" action="ActionSetPerms" path="/etc/shadow-" name="root:" value="0400"/>
+    </remediation>
 
-  <remediation id="set-etc-gshadow-perms" msids="11.3,11.4" description="Set permissions on /etc/gshadow">
-    <action distro="*" action="ActionSetPerms" path="/etc/gshadow" name="root:" value="0400"/>
-    <action distro="*" action="ActionSetPerms" path="/etc/gshadow-" name="root:" value="0400"/>
-  </remediation>
+    <remediation id="set-etc-gshadow-perms" msids="11.3,11.4" description="Set permissions on /etc/gshadow">
+      <action distro="*" action="ActionSetPerms" path="/etc/gshadow" name="root:" value="0400"/>
+      <action distro="*" action="ActionSetPerms" path="/etc/gshadow-" name="root:" value="0400"/>
+    </remediation>
 
-  <remediation id="set-etc-passwd-perms" msids="12.1,12.3" description="Set permissions on /etc/passwd">
-    <action distro="*" action="ActionSetPerms" path="/etc/passwd" name="root:root" value="0644"/>
-    <action distro="*" action="ActionSetPerms" path="/etc/passwd-" name="root:root" value="0600"/>
-  </remediation>
+    <remediation id="set-etc-passwd-perms" msids="12.1,12.3" description="Set permissions on /etc/passwd">
+      <action distro="*" action="ActionSetPerms" path="/etc/passwd" name="root:root" value="0644"/>
+      <action distro="*" action="ActionSetPerms" path="/etc/passwd-" name="root:root" value="0644"/>
+    </remediation>
 
-  <remediation id="set-etc-group-perms" msids="12.2,12.4" description="Set permissions on /etc/group">
-    <action distro="*" action="ActionSetPerms" path="/etc/group" name="root:root" value="0644"/>
-    <action distro="*" action="ActionSetPerms" path="/etc/group-" name="root:root" value="0644"/>
-  </remediation>
+    <remediation id="set-etc-group-perms" msids="12.2,12.4" description="Set permissions on /etc/group">
+      <action distro="*" action="ActionSetPerms" path="/etc/group" name="root:root" value="0644"/>
+      <action distro="*" action="ActionSetPerms" path="/etc/group-" name="root:root" value="0644"/>
+    </remediation>
 
-  <remediation id="fix-anacrontab-perms" msids="91" description="Fix anacrontab perms">
-     <action distro="*" action="ActionSetPerms" path="/etc/anacrontab" value="0600"/>
-  </remediation>
+    <remediation id="fix-anacrontab-perms" msids="91" description="Fix anacrontab perms">
+       <action distro="*" action="ActionSetPerms" path="/etc/anacrontab" value="0600"/>
+    </remediation>
 
-  <remediation id="fix-crontab-perms" msids="92" description="Fix crontab perms">
-   <action distro="*" action="ActionSetPerms" path="/etc/crontab" value="0600"/>
-  </remediation>
-
-  <remediation id="fix-cron-file-perms" msids="93,94,95,96,97" description="Fix cron file/folder permissions">
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="fix-cron-file-perms" msids="93,94,95,96,97" description="Fix cron file/folder permissions">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 # (Audit 93-97, 100-103) Fix Permissions on cron files/folders
-chmod 700 /etc/cron.*
-      ]]>
-      </script>
-    </action>
-  </remediation>
+chmod 700 /etc/cron.d
+chmod 700 /etc/cron.daily
+chmod 700 /etc/cron.hourly
+chmod 700 /etc/cron.monthly
+chmod 700 /etc/cron.weekly
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="fix-root-path-perms" msids="27.2" description="Fix permissions on dirs in root's path">
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
-for d in $(bash -l -c 'echo $PATH' | sed 's/:/ /g')
-do
-    chmod og-w $d
-done
-      ]]>
-      </script>
-    </action>
-  </remediation>
+    <remediation id="disable-avahi-daemon" msids="114" description="Disable avahi-daemon service">
+      <action distro="*" action="ActionDisableService" service="avahi-daemon"/>
+    </remediation>
 
-  <remediation id="disable-non-root-system-login" msids="23.1" description="Disable login for system accounts">
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
-# (Audit 23.1) Disable login for system accounts
-for i in $(egrep -v '^([^:]*:){5}.*(root|home)' /etc/passwd | egrep -v '^([^:]*:){6}(/dev/null|/bin/false|/sbin/nologin|/usr/sbin/nologin)' | cut -d ":" -f 1; egrep '^syslog:' /etc/passwd | egrep -v '^syslog:([^:]*:){5}:(/dev/null|/bin/false|/sbin/nologin|/usr/sbin/nologin)' | cut -d ":" -f 1)
-do
-    chsh -s /bin/false $i 2>/dev/null
-done
-      ]]>
-      </script>
-    </action>
-  </remediation>
+    <remediation id="disable-cups" msids="115" description="Disable cups service">
+      <action distro="*" action="ActionDisableService" service="cups"/>
+    </remediation>
 
-  <remediation id="disable-avahi-daemon" msids="114" description="Disable avahi-daemon service">
-    <action distro="*" action="ActionDisableService" service="avahi-daemon"/>
-  </remediation>
+    <remediation id="disable-rpcgssd" msids="126" description="Disable rpcgssd service">
+      <action distro="*" action="ActionDisableService" service="rpcgssd"/>
+    </remediation>
 
-  <remediation id="disable-cups" msids="115" description="Disable cups service">
-    <action distro="*" action="ActionDisableService" service="cups"/>
-  </remediation>
+    <remediation id="disable-rpcidmapd" msids="127" description="Disable rpcidmapd service">
+      <action distro="*" action="ActionDisableService" service="rpcidmapd"/>
+    </remediation>
 
-  <remediation id="disable-rpcgssd" msids="126" description="Disable rpcgssd service">
-    <action distro="*" action="ActionDisableService" service="rpcgssd"/>
-  </remediation>
+    <remediation id="disable-rsync" msids="181" description="Disable rsync service">
+      <action distro="*" action="ActionDisableService" service="rsyncd"/>
+    </remediation>
 
-  <remediation id="disable-rpcidmapd" msids="127" description="Disable rpcidmapd service">
-    <action distro="*" action="ActionDisableService" service="rpcidmapd"/>
-  </remediation>
+    <remediation id="disable-rpcbind" msids="129.1" description="Disable rpcbind service">
+      <action distro="SLES=11" action="ActionDisableService" service="nfs"/>
+      <action distro="*" action="ActionDisableService" service="rpcbind"/>
+      <action distro="CentOS>=7|RedHat>=7|SLES>11|AlmaLinux|Rocky" action="ActionDisableService" service="rpcbind.socket"/>
+    </remediation>
 
-  <remediation id="disable-rsync" msids="181" description="Disable rsync service">
-    <action distro="*" action="ActionDisableService" service="rsyncd"/>
-  </remediation>
+    <remediation id="disable-nfs" msids="129.2" description="Disable NFS service">
+      <action distro="*" action="ActionDisableService" service="nfs-server"/>
+    </remediation>
 
-  <remediation id="disable-rpcbind" msids="129" description="Disable rpcbind service">
-    <action distro="SLES=11" action="ActionDisableService" service="nfs"/>
-    <action distro="*" action="ActionDisableService" service="rpcbind"/>
-    <action distro="CentOS>=7|RedHat>=7|SLES>11" action="ActionDisableService" service="rpcbind.socket"/>
-  </remediation>
-
-  <remediation id="disable-unnecessary-kernel-mods" msids="1.1.21.1,6.1,6.2,6.3,6.4,6.5,6.7,54,55,56,57" description="Disable unnecessary Kernel Modules">
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
-# (Audit6.1 - 6.6, 54, 55, 57) Disable unnecessary Kernel Modules
-cat > /etc/modprobe.d/blacklist-azurebaseline.conf <<EOF
-# Modules disabled per Azure baseline
+    <remediation id="disable-dccp" msids="54" description="Disable DCCP Kernel Module">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+cat > /etc/modprobe.d/disable-dccp.conf <<EOF
 install dccp /bin/true
+EOF
+chown root.root /etc/modprobe.d/disable-dccp.conf
+chmod 644 /etc/modprobe.d/disable-dccp.conf
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="disable-sctp" msids="55" description="Disable SCTP Kernel Module">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+cat > /etc/modprobe.d/disable-sctp.conf <<EOF
 install sctp /bin/true
+EOF
+chown root.root /etc/modprobe.d/disable-sctp.conf
+chmod 644 /etc/modprobe.d/disable-sctp.conf
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="disable-rds" msids="56" description="Disable RDS Kernel Module">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+cat > /etc/modprobe.d/disable-rds.conf <<EOF
 install rds /bin/true
+EOF
+chown root.root /etc/modprobe.d/disable-rds.conf
+chmod 644 /etc/modprobe.d/disable-rds.conf
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="disable-tipc" msids="57" description="Disable tipc Kernel Module">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+cat > /etc/modprobe.d/disable-tipc.conf <<EOF
 install tipc /bin/true
+EOF
+chown root.root /etc/modprobe.d/disable-tipc.conf
+chmod 644 /etc/modprobe.d/disable-tipc.conf
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="disable-cramfs" msids="6.1" description="Disable cramfs Kernel Module">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+cat > /etc/modprobe.d/disable-cramfs.conf <<EOF
 install cramfs /bin/true
+EOF
+chown root.root /etc/modprobe.d/disable-cramfs.conf
+chmod 644 /etc/modprobe.d/disable-cramfs.conf
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="disable-freevxfs" msids="6.2" description="Disable freevxfs Kernel Module">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+cat > /etc/modprobe.d/disable-freevxfs.conf <<EOF
 install freevxfs /bin/true
+EOF
+chown root.root /etc/modprobe.d/disable-freevxfs.conf
+chmod 644 /etc/modprobe.d/disable-freevxfs.conf
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="disable-hfs" msids="6.3" description="Disable hfs Kernel Module">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+cat > /etc/modprobe.d/disable-hfs.conf <<EOF
 install hfs /bin/true
+EOF
+chown root.root /etc/modprobe.d/disable-hfs.conf
+chmod 644 /etc/modprobe.d/disable-hfs.conf
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="disable-hfsplus" msids="6.4" description="Disable hfsplus Kernel Module">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+cat > /etc/modprobe.d/disable-hfsplus.conf <<EOF
 install hfsplus /bin/true
+EOF
+chown root.root /etc/modprobe.d/disable-hfsplus.conf
+chmod 644 /etc/modprobe.d/disable-hfsplus.conf
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="disable-jffs2" msids="6.5" description="Disable jffs2 Kernel Module">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+cat > /etc/modprobe.d/disable-jffs2.conf <<EOF
 install jffs2 /bin/true
+EOF
+chown root.root /etc/modprobe.d/disable-jffs2.conf
+chmod 644 /etc/modprobe.d/disable-jffs2.conf
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="disable-usb-storage" msids="1.1.21.1" description="Disable usb-storage Kernel Module">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+cat > /etc/modprobe.d/disable-usb-storage.conf <<EOF
 install usb-storage /bin/true
 EOF
-chown root.root /etc/modprobe.d/blacklist-azurebaseline.conf
-chmod 644 /etc/modprobe.d/blacklist-azurebaseline.conf
-      ]]>
-      </script>
-    </action>
-  </remediation>
-  <remediation id="configure-password-policy-max-days" msids="157.1" description="Configure PASS_MAX_DAYS in pam ">
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+chown root.root /etc/modprobe.d/disable-usb-storage.conf
+chmod 644 /etc/modprobe.d/disable-usb-storage.conf
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="configure-password-policy-max-days" msids="157.1" description="Configure PASS_MAX_DAYS in pam ">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 sed -i 's/^#*\s*\(PASS_MAX_DAYS\s\+\)[0-9]\+/\170/g' /etc/login.defs
-      ]]>
-      </script>
-    </action>
-  </remediation>
-  <remediation id="configure-password-policy-warn-age" msids="157.2" description="Configure PASS_WARN_AGE in pam ">
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+        ]]>
+        </script>
+      </action>
+    </remediation>
+    <remediation id="configure-password-policy-warn-age" msids="157.2" description="Configure PASS_WARN_AGE in pam ">
+      <action distro="*" action="ActionScript">
+       <script>
+        <![CDATA[
 sed -i 's/^#*\s*\(PASS_WARN_AGE\s\+\)[0-9]\+/\115/g' /etc/login.defs
-      ]]>
-      </script>
-    </action>
-  </remediation>
-  <remediation id="configure-password-policy-history" msids="157.5" description="Configure password history in pam ">
-    <action distro="Ubuntu" action="ActionScript">
-      <script>
-      <![CDATA[
+        ]]>
+        </script>
+      </action>
+    </remediation>
+
+    <remediation id="configure-password-policy-history" msids="157.5" description="Configure password history in pam ">
+      <action distro="Ubuntu" action="ActionScript">
+        <script>
+        <![CDATA[
 if [ -z "$(egrep '^\s*password\s+.+pam_unix.so.+remember=[0-9]' /etc/pam.d/common-password)" ]; then
     sed -i 's/^#*\s*\(password\s\+.\+pam_unix.so\s\+\)/\1remember=7 /g' /etc/pam.d/common-password
 else
     sed -i 's/^#*\s*\(password\s\+.\+pam_unix.so.\+\)remember=[0-9]/\1remember=7/g' /etc/pam.d/common-password
 fi
-      ]]>
-      </script>
-    </action>
-  </remediation>
-  <remediation id="disable-autofs" msids="1.1.21" description="Disable autofs">
-    <action distro="*" action="ActionDisableService" service="autofs"/>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="disable-core-dumps" msids="1.5.1">
-    <action distro="*" action="ActionEditConfig" name-regex="\*\s*hard\s+core" name="* hard core" value="0" value-regex="[0-9]+" path="/etc/security/limits.conf"/>
-     <action distro="*" action="ActionEditConfig" name="fs.suid_dumpable" value="0" value-regex="[0-9]+" sep="=" path="/etc/sysctl.conf"/>
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
-sysctl -w fs.suid_dumpable=0
-      ]]>
-      </script>
-    </action>
-  </remediation>
+    <remediation id="set-pass-min-days" msids="157.12" description="Set the minimum days between password changes to 7">
+      <action distro="*" action="ActionEditConfig" name="PASS_MIN_DAYS" value="7" value-regex="[0-9]+" path="/etc/login.defs"/>
+    </remediation>
 
-  <remediation id="remove-prelink" msids="1.5.4" description="Ensure prelink is not installed">
-    <action distro="*" action="ActionRemovePackage" package="prelink"/>
-  </remediation>
-
-  <remediation id="remove-landscape-common" msids="158" description="Ensure landscape-common is not installed">
-    <action distro="Ubuntu" action="ActionRemovePackage" package="landscape-common"/>
-  </remediation>
-
-  <remediation id="file-permissions" msids="1.7.1.4,1.7.1.5,1.7.1.6,3.4.4,3.4.5" description="Ensure permissions on /etc/motd /etc/issue /etc/hosts.allow  /etc/hosts.deny and /etc/issue.net are configured">
-    <action distro="*" action="ActionSetPerms" path="/etc/motd" name="root:root" value="0644"/>
-    <action distro="*" action="ActionSetPerms" path="/etc/issue" name="root:root" value="0644"/>
-    <action distro="*" action="ActionSetPerms" path="/etc/issue.net" name="root:root" value="0644"/>
-    <action distro="*" action="ActionSetPerms" path="/etc/hosts.allow" name="root:root" value="0644"/>
-    <action distro="*" action="ActionSetPerms" path="/etc/hosts.deny" name="root:root" value="0644"/>
-  </remediation>
-
-  <remediation id="remove-talk" msids="2.3.3" description="Remove talk client">
-    <action distro="*" action="ActionRemoveService" service="talk"/>
-  </remediation>
-
-  <remediation id="logger-config-file-permissions" msids="63.1" description="Set the permissions of logger config files">
-    <action distro="*" action="ActionSetPerms" path="/etc/syslog-ng/syslog-ng.conf" value="0644"/>
-    <action distro="*" action="ActionSetPerms" path="/etc/rsyslog.conf" value="0644"/>
-  </remediation>
-
-  <remediation id="set-pass-min-days" msids="157.12" description="Set the minimum days between password changes to 7">
-    <action distro="*" action="ActionEditConfig" name="PASS_MIN_DAYS" value="7" value-regex="[0-9]+" path="/etc/login.defs"/>
-  </remediation>
-
-  <remediation id="remove-games-user" msids="159" description="Remove the 'games' user">
-    <action distro="Ubuntu" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="remove-games-user" msids="159" description="Remove the 'games' user">
+      <action distro="Ubuntu" action="ActionScript">
+        <script>
+        <![CDATA[
 if id games &>/dev/null; then
   userdel -r -f games
 fi
-]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-  <remediation id="set-smb-min-version" msids="185" description="Disable smb v1">
-    <action distro="*" action="ActionScript">
-      <script>
-      <![CDATA[
+    <remediation id="set-smb-min-version" msids="185" description="Disable smb v1">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
 # Require SMB v2
 if [ -n "$(egrep '^\s*min\sprotocol\s+=\s+SMB1' /etc/samba/smb.conf)" ]; then
     sed -i 's/\(^ *min  *protocol *= *\)SMB1/\1SMB2/i' /etc/samba/smb.conf
 elif [ -z "$(egrep '^\s*min\sprotocol\s+=\s+SMB2' /etc/samba/smb.conf)" ]; then
     sed -i 's/\(^\[global\].*$\)/\1\nmin protocol = SMB2/i' /etc/samba/smb.conf
 fi
-      ]]>
-      </script>
-    </action>
-  </remediation>
+        ]]>
+        </script>
+      </action>
+    </remediation>
 
-</remediations>
+  </remediations>
 </baseline>
-

@@ -462,7 +462,7 @@ static JSON_Status json_object_dotremove_internal(JSON_Object *object, const cha
         return json_object_remove_internal(object, name, free_value);
     }
     temp_value = json_object_getn_value(object, name, dot_pos - name);
-    if (json_value_get_type(temp_value) != JSONObject) {
+    if (temp_value == NULL || json_value_get_type(temp_value) != JSONObject) {
         return JSONFailure;
     }
     temp_object = json_value_get_object(temp_value);
@@ -897,9 +897,12 @@ static int json_serialize_to_buffer_r(const JSON_Value *value, char *buf, int le
                     APPEND_INDENT(level+1);
                 }
                 temp_value = json_array_get_value(array, i);
+                if(temp_value == NULL) {
+                    return JSONFailure;
+                }
                 written = json_serialize_to_buffer_r(temp_value, buf, level+1, is_pretty, num_buf);
                 if (written < 0) {
-                    return -1;
+                    return JSONFailure;
                 }
                 if (buf != NULL) {
                     buf += written;
@@ -945,6 +948,9 @@ static int json_serialize_to_buffer_r(const JSON_Value *value, char *buf, int le
                     APPEND_STRING(" ");
                 }
                 temp_value = json_object_get_value(object, key);
+                if(temp_value == NULL) {
+                    return JSONFailure;
+                }
                 written = json_serialize_to_buffer_r(temp_value, buf, level+1, is_pretty, num_buf);
                 if (written < 0) {
                     return -1;
@@ -1430,6 +1436,10 @@ JSON_Value * json_value_deep_copy(const JSON_Value *value) {
             temp_array_copy = json_value_get_array(return_value);
             for (i = 0; i < json_array_get_count(temp_array); i++) {
                 temp_value = json_array_get_value(temp_array, i);
+                if(temp_value == NULL) {
+                    json_value_free(return_value);
+                    return NULL;
+                }
                 temp_value_copy = json_value_deep_copy(temp_value);
                 if (temp_value_copy == NULL) {
                     json_value_free(return_value);
@@ -1451,7 +1461,15 @@ JSON_Value * json_value_deep_copy(const JSON_Value *value) {
             temp_object_copy = json_value_get_object(return_value);
             for (i = 0; i < json_object_get_count(temp_object); i++) {
                 temp_key = json_object_get_name(temp_object, i);
+                if (temp_key == NULL) {
+                    json_value_free(return_value);
+                    return NULL;
+                }
                 temp_value = json_object_get_value(temp_object, temp_key);
+                if (temp_value == NULL) {
+                    json_value_free(return_value);
+                    return NULL;
+                }
                 temp_value_copy = json_value_deep_copy(temp_value);
                 if (temp_value_copy == NULL) {
                     json_value_free(return_value);
@@ -1925,8 +1943,14 @@ JSON_Status json_validate(const JSON_Value *schema, const JSON_Value *value) {
             }
             /* Get first value from array, rest is ignored */
             temp_schema_value = json_array_get_value(schema_array, 0);
+            if(temp_schema_value == NULL) {
+                return JSONFailure;
+            }
             for (i = 0; i < json_array_get_count(value_array); i++) {
                 temp_value = json_array_get_value(value_array, i);
+                if(temp_value == NULL) {
+                    return JSONFailure;
+                }
                 if (json_validate(temp_schema_value, temp_value) == JSONFailure) {
                     return JSONFailure;
                 }
@@ -1943,7 +1967,13 @@ JSON_Status json_validate(const JSON_Value *schema, const JSON_Value *value) {
             }
             for (i = 0; i < count; i++) {
                 key = json_object_get_name(schema_object, i);
+                if(key == NULL) {
+                    return JSONFailure;
+                }
                 temp_schema_value = json_object_get_value(schema_object, key);
+                if(temp_schema_value == NULL) {
+                    return JSONFailure;
+                }
                 temp_value = json_object_get_value(value_object, key);
                 if (temp_value == NULL) {
                     return JSONFailure;
@@ -1998,6 +2028,9 @@ int json_value_equals(const JSON_Value *a, const JSON_Value *b) {
             }
             for (i = 0; i < a_count; i++) {
                 key = json_object_get_name(a_object, i);
+                if(key == NULL) {
+                    return 0;
+                }
                 if (!json_value_equals(json_object_get_value(a_object, key),
                                        json_object_get_value(b_object, key))) {
                     return 0;

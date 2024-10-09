@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 import sys
 from imp        import load_source
 from os.path    import dirname, join, realpath, isfile

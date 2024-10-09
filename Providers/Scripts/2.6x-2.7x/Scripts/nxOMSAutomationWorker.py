@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # ====================================
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # See license.txt for license information.
@@ -88,7 +88,7 @@ def Set_Marshall(ResourceSettings):
             os.chmod(WORKER_STATE_DIR, PERMISSION_LEVEL_0770)
 
         # set cert permissions
-        proc = subprocess.Popen(["sudo", "-u", AUTOMATION_USER, "python", OMS_UTIL_FILE_PATH, "--initialize"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc = subprocess.Popen(["sudo", "-u", AUTOMATION_USER, "python2", OMS_UTIL_FILE_PATH, "--initialize"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate()
         if proc.returncode != 0:
             raise Exception("call to omsutil.py --initialize failed. %s, %s" % (stdout, stderr))
@@ -118,7 +118,7 @@ def Set_Marshall(ResourceSettings):
             if not os.path.isfile(PROXY_CONF_PATH_NEW) and os.path.isfile(PROXY_CONF_PATH_LEGACY):
                 proxy_conf_path = PROXY_CONF_PATH_LEGACY
 
-            args = ["python", REGISTRATION_FILE_PATH, "--register", "-w", settings.workspace_id, "-a", agent_id,
+            args = ["python2", REGISTRATION_FILE_PATH, "--register", "-w", settings.workspace_id, "-a", agent_id,
                     "-c", OMS_CERTIFICATE_PATH, "-k", OMS_CERT_KEY_PATH, "-f", WORKING_DIRECTORY_PATH, "-s",
                     WORKER_STATE_DIR, "-e", settings.azure_dns_agent_svc_zone, "-p", proxy_conf_path, "-g",
                     KEYRING_PATH]
@@ -347,7 +347,7 @@ def get_optional_metadata():
     vm_id = unknown
     is_azure_vm = False
     try:
-        proc = subprocess.Popen(["sudo", "-u", AUTOMATION_USER, "python", OMS_UTIL_FILE_PATH, "--dmidecode"],
+        proc = subprocess.Popen(["sudo", "-u", AUTOMATION_USER, "python2", OMS_UTIL_FILE_PATH, "--dmidecode"],
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         dmidecode, error = proc.communicate()
         if proc.returncode != 0 or not dmidecode:
@@ -602,7 +602,7 @@ def start_worker_manager_process(workspace_id):
     :param workspace_id:
     :return: the pid of the worker manager process
     """
-    proc = subprocess.Popen(["sudo", "-u", AUTOMATION_USER, "python", WORKER_MANAGER_START_PATH, OMS_CONF_FILE_PATH,
+    proc = subprocess.Popen(["sudo", "-u", AUTOMATION_USER, "python2", WORKER_MANAGER_START_PATH, OMS_CONF_FILE_PATH,
                              WORKSPACE_ID_PREFIX + workspace_id, get_module_version()])
     for i in range(0, 5):
         time.sleep(3)

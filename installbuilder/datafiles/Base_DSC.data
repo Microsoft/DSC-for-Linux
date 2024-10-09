@@ -77,19 +77,23 @@ SHLIB_EXT: 'so'
 /opt/microsoft/omsconfig/Scripts/OMSYumUpdates.sh; intermediate/Scripts/OMSYumUpdates.sh; 755; root; root
 /opt/microsoft/omsconfig/Scripts/OMSZypperUpdates.sh; intermediate/Scripts/OMSZypperUpdates.sh; 755; root; root
 /opt/microsoft/omsconfig/Scripts/OMSAptUpdates.sh; intermediate/Scripts/OMSAptUpdates.sh; 755; root; root
+/opt/microsoft/omsconfig/Scripts/OMSYumSecurityUpdates.sh; intermediate/Scripts/OMSYumSecurityUpdates.sh; 755; root; root
+/opt/microsoft/omsconfig/Scripts/OMSZypperSecurityUpdates.sh; intermediate/Scripts/OMSZypperSecurityUpdates.sh; 755; root; root
 /opt/microsoft/omsconfig/Scripts/NPMAgentBinaryCap.sh; intermediate/Scripts/NPMAgentBinaryCap.sh; 755; root; root
 /opt/microsoft/omsconfig/Scripts/OMSAuditdPlugin.sh; intermediate/Scripts/OMSAuditdPlugin.sh; 755; root; root
 /opt/microsoft/omsconfig/Scripts/OMS_MetaConfigHelper.py; intermediate/Scripts/OMS_MetaConfigHelper.py; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/omsconfig/Scripts/python3/OMS_MetaConfigHelper.py; intermediate/Scripts/python3/OMS_MetaConfigHelper.py; 755; ${{RUN_AS_USER}}; root
-/opt/microsoft/omsconfig/module_packages/nx_1.1.zip; release/nx_1.1.zip; 755; ${{RUN_AS_USER}}; root
+/opt/microsoft/omsconfig/module_packages/nx_1.5.zip; release/nx_1.5.zip; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/omsconfig/module_packages/nxOMSPerfCounter_2.3.zip; release/nxOMSPerfCounter_2.3.zip; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/omsconfig/module_packages/nxOMSSyslog_2.5.zip; release/nxOMSSyslog_2.5.zip; 755; ${{RUN_AS_USER}}; root
-/opt/microsoft/omsconfig/module_packages/nxOMSSudoCustomLog_2.7.zip; release/nxOMSSudoCustomLog_2.7.zip; 755; ${{RUN_AS_USER}}; root
+/opt/microsoft/omsconfig/module_packages/nxOMSSudoCustomLog_2.8.zip; release/nxOMSSudoCustomLog_2.8.zip; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/omsconfig/module_packages/nxOMSKeyMgmt_1.0.zip; release/nxOMSKeyMgmt_1.0.zip; 755; ${{RUN_AS_USER}}; root
-/opt/microsoft/${{SHORT_NAME}}/keys/dscgpgkey.asc; LCM/keys/dscgpgkey.asc; 644; ${{RUN_AS_USER}}; root
-/opt/microsoft/${{SHORT_NAME}}/keys/msgpgkey.asc; LCM/keys/msgpgkey.asc; 644; ${{RUN_AS_USER}}; root
+/opt/microsoft/${{SHORT_NAME}}/keys/dscgpgkey.asc; LCM/keys/dscgpgkey.asc; 644; root; root
+/opt/microsoft/${{SHORT_NAME}}/keys/msgpgkey.asc; LCM/keys/msgpgkey.asc; 644; root; root
 /opt/microsoft/omsconfig/module_packages/nxFileInventory_1.4.zip; release/nxFileInventory_1.4.zip; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/omsconfig/module_packages/nxOMSGenerateInventoryMof_1.5.zip; release/nxOMSGenerateInventoryMof_1.5.zip; 755; ${{RUN_AS_USER}}; root
+
+/opt/microsoft/omsconfig/secure/secure_update.sh; installbuilder/secure_update.sh; 755; root; root
 
 #if PFARCH == x86
 /opt/microsoft/omsconfig/module_packages/nxOMSAgentNPMConfig_2.2.zip; release/nxOMSAgentNPMConfig_2.2.zip; 755; ${{RUN_AS_USER}}; root
@@ -98,7 +102,7 @@ SHLIB_EXT: 'so'
 /opt/microsoft/omsconfig/module_packages/nxOMSContainers_1.0.zip; release/nxOMSContainers_1.0.zip; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/omsconfig/module_packages/nxOMSCustomLog_1.0.zip; release/nxOMSCustomLog_1.0.zip; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/omsconfig/module_packages/nxOMSGenerateInventoryMof_1.5.zip; release/nxOMSGenerateInventoryMof_1.5.zip; 755; ${{RUN_AS_USER}}; root
-/opt/microsoft/omsconfig/module_packages/nxOMSPlugin_3.62.zip; release/nxOMSPlugin_3.62.zip; 755; ${{RUN_AS_USER}}; root
+/opt/microsoft/omsconfig/module_packages/nxOMSPlugin_3.74.zip; release/nxOMSPlugin_3.74.zip; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/omsconfig/module_packages/nxOMSWLI_1.46.zip; release/nxOMSWLI_1.46.zip; 755; ${{RUN_AS_USER}}; root
 #endif
 
@@ -111,7 +115,7 @@ SHLIB_EXT: 'so'
 /opt/microsoft/${{SHORT_NAME}}/etc/dsccore.reg; LCM/dsccore.reg; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/bin/ConsistencyInvoker; omi-1.0.8/output/bin/ConsistencyInvoker; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/lib/libdsccore.so; omi-1.0.8/output/lib/libdsccore.so; 755; ${{RUN_AS_USER}}; root
-/opt/microsoft/${{SHORT_NAME}}/module_packages/nx_1.1.zip; release/nx_1.1.zip; 755; ${{RUN_AS_USER}}; root
+/opt/microsoft/${{SHORT_NAME}}/module_packages/nx_1.5.zip; release/nx_1.5.zip; 755; ${{RUN_AS_USER}}; root
 
 
 #endif
@@ -119,14 +123,14 @@ SHLIB_EXT: 'so'
 
 %Directories
 /opt/microsoft;                                           755; root; root; sysdir
-/opt/microsoft/${{SHORT_NAME}};                           755; ${{RUN_AS_USER}}; root
+/opt/microsoft/${{SHORT_NAME}};                           755; root; root
 /opt/microsoft/${{SHORT_NAME}}/etc;                       755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/mof;                       755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/lib;                       755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/bin;                       755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/modules;                   755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/module_packages;           755; ${{RUN_AS_USER}}; root
-/opt/microsoft/${{SHORT_NAME}}/keys;                      755; ${{RUN_AS_USER}}; root
+/opt/microsoft/${{SHORT_NAME}}/keys;                      755; root; root
 /opt/microsoft/${{SHORT_NAME}}/Scripts;                   755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/Scripts/python3;                 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/Scripts/2.4x-2.5x;         755; ${{RUN_AS_USER}}; root
@@ -135,6 +139,7 @@ SHLIB_EXT: 'so'
 /opt/microsoft/${{SHORT_NAME}}/Scripts/2.6x-2.7x/Scripts; 755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/Scripts/3.x;               755; ${{RUN_AS_USER}}; root
 /opt/microsoft/${{SHORT_NAME}}/Scripts/3.x/Scripts;       755; ${{RUN_AS_USER}}; root
+/opt/microsoft/${{SHORT_NAME}}/secure;                    755; root; root
 /etc/opt/omi/conf;                                        755; root; root; sysdir
 /etc/opt/omi/conf/${{SHORT_NAME}};                        755; ${{RUN_AS_USER}}; root
 /etc/logrotate.d;                                         755; root; root; sysdir
@@ -209,14 +214,18 @@ fi
 
 %Preinstall_200
 # pythonVersion check must be repeated for each section
-if  [ ! "$(python2 --version 2>&1 | grep 'not found')" ]; then
-  echo "Using python2"
-  pythonVersion="python2"
-elif [ ! "$(python3 --version 2>&1 | grep 'not found')" ]; then
+version=$(python3 -V 2>&1 | grep -Po '(?<=Python )(.+)')
+if [ ! -z "$version" ]; then
   echo "Using python3"
   pythonVersion="python3"
 else
-  echo "Python not found."
+  version=$(python2 -V 2>&1 | grep -Po '(?<=Python )(.+)')
+  if [ ! -z "$version" ]; then
+    echo "Using python2"
+    pythonVersion="python2"
+  else
+    echo "Python not found."
+  fi
 fi
 # Only check for ctypes if python2 is installed
 if [ "$pythonVersion" = "python2" ]; then
@@ -234,7 +243,12 @@ fi
 echo "Cleanning up existing dsc_hosts..."
 kill $(ps -eo pid,cmd | grep '/opt/dsc/bin/dsc_host' | grep -v grep | tr -s ' ' | sed 's/^[ \t]*//' | cut -d' ' -f1) -9 2&>1 > /dev/null
 chmod -R 777 /opt/dsc
-rm -rfv /opt/dsc
+# Clean dsc directory in case of install and clean
+echo "Deployment operation type :" $1
+if [ "$1" = "1" -o "$1" = 1 -o "$1" = "install" -o "$1" = "clean" ]; then
+    echo "Cleanning directory /opt/dsc..."
+    rm -rfv /opt/dsc
+fi
 rm -f /etc/opt/omi/conf/omsconfig/inventory_lock
 echo "Cleaned up existing dsc_hosts..."
 
@@ -292,6 +306,12 @@ chown omsagent /opt/dsc/dsc_host_ready
 chgrp omsagent /opt/dsc/dsc_host_ready
 chmod 644 /opt/dsc/dsc_host_ready
 
+# Set up secure_update cache dir
+mkdir -p /var/opt/microsoft/omsconfig_secure_cache
+chown root /var/opt/microsoft/omsconfig_secure_cache
+chgrp root /var/opt/microsoft/omsconfig_secure_cache
+chmod 755 /var/opt/microsoft/omsconfig_secure_cache
+
 #endif
 
 
@@ -307,7 +327,7 @@ ln -fs /opt/microsoft/${{SHORT_NAME}}/bin/OMSConsistencyInvoker $OMI_HOME/bin/OM
 #else
 
 # Make OMI listen on the standard DSC port
-$OMI_HOME/bin/omiconfigeditor httpsport -a 5986 < $CONFIG_SYSCONFDIR/omiserver.conf > $CONFIG_SYSCONFDIR/omiserver.conf_temp
+$OMI_HOME/bin/omiconfigeditor httpsport -a 0 < $CONFIG_SYSCONFDIR/omiserver.conf > $CONFIG_SYSCONFDIR/omiserver.conf_temp
 mv $CONFIG_SYSCONFDIR/omiserver.conf_temp $CONFIG_SYSCONFDIR/omiserver.conf
 
 mkdir -p $OMI_REGISTER_DIR/root-Microsoft-DesiredStateConfiguration
@@ -335,36 +355,55 @@ chown -R ${{RUN_AS_USER}} $OMI_REGISTER_DIR/root-oms
 chown -R ${{RUN_AS_USER}} /etc/opt/omi/conf/${{SHORT_NAME}}
 chown -R ${{RUN_AS_USER}} /opt/microsoft/omsagent/plugin
 
+# Secure the /opt/microsoft/omsagent/plugin dir so that root owned files
+# cannot me modified by non-root while still allowing ${{RUN_AS_USER}} to modify
+# ${{RUN_AS_USER}} owned files
+chown root /opt/microsoft/omsagent/plugin
+chgrp omiusers /opt/microsoft/omsagent/plugin
+chmod 1775 /opt/microsoft/omsagent/plugin
+
 # If this is ever changed/removed, coordinate with nxOMSAuditdPlugin author/maintainer(s)
 chown -R ${{RUN_AS_USER}} /opt/microsoft/omsconfig/Scripts
 
+# Secure the /opt/microsoft/omsconfig/Scripts dir so that root owned files
+# cannot me modified by non-root while still allowing ${{RUN_AS_USER}} to modify
+# ${{RUN_AS_USER}} owned files
+chown root /opt/microsoft/omsconfig/Scripts
+chgrp omiusers /opt/microsoft/omsconfig/Scripts
+chmod 1775 /opt/microsoft/omsconfig/Scripts
+
+
 # pythonVersion check must be repeated for each section
-if  [ ! "$(python2 --version 2>&1 | grep 'not found')" ]; then
-  echo "Using python2"
-  pythonVersion="python2"
-elif [ ! "$(python3 --version 2>&1 | grep 'not found')" ]; then
+version=$(python3 -V 2>&1 | grep -Po '(?<=Python )(.+)')
+if [ ! -z "$version" ]; then
   echo "Using python3"
   pythonVersion="python3"
 else
-  echo "Python not found."
+  version=$(python2 -V 2>&1 | grep -Po '(?<=Python )(.+)')
+  if [ ! -z "$version" ]; then
+    echo "Using python2"
+    pythonVersion="python2"
+  else
+    echo "Python not found."
+  fi
 fi
 
 # Set up built-in resource modules for OMS DSC
 if [ "$pythonVersion" = "python3" ]; then
 	echo "Running python3, python version is ", $pythonVersion
-	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nx_1.1.zip 0"
+	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nx_1.5.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSPerfCounter_2.3.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSSyslog_2.5.zip 0"
-	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSSudoCustomLog_2.7.zip 0"
+	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSSudoCustomLog_2.8.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSKeyMgmt_1.0.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxFileInventory_1.4.zip 0"
   su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSGenerateInventoryMof_1.5.zip 0"
 else
   echo "Running  python version is ", $pythonVersion
-	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nx_1.1.zip 0"
+	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nx_1.5.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSPerfCounter_2.3.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSSyslog_2.5.zip 0"
-	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSSudoCustomLog_2.7.zip 0"
+	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSSudoCustomLog_2.8.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSKeyMgmt_1.0.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxFileInventory_1.4.zip 0"
   su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSGenerateInventoryMof_1.5.zip 0"
@@ -379,7 +418,7 @@ if [ "$pythonVersion" = "python3" ]; then
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSContainers_1.0.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSCustomLog_1.0.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSGenerateInventoryMof_1.5.zip 0"
-	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSPlugin_3.62.zip 0"
+	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSPlugin_3.74.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/python3/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSWLI_1.46.zip 0"
 else
   echo "Running python2 python version is ", $pythonVersion
@@ -389,7 +428,7 @@ else
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSContainers_1.0.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSCustomLog_1.0.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSGenerateInventoryMof_1.5.zip 0"
-	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSPlugin_3.62.zip 0"
+	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSPlugin_3.74.zip 0"
 	su - omsagent -c "/opt/microsoft/omsconfig/Scripts/InstallModule.py /opt/microsoft/omsconfig/module_packages/nxOMSWLI_1.46.zip 0"
 #endif
 
@@ -400,13 +439,13 @@ else
 # Check if DIY DSC install module script is present on the machine
 if [ -f /opt/microsoft/dsc/Scripts/InstallModule.py ]; then
   # Check if nx module package is available in DIY DSC
-  if [ -f /opt/microsoft/dsc/module_packages/nx_1.1.zip ]; then
+  if [ -f /opt/microsoft/dsc/module_packages/nx_1.5.zip ]; then
     if [ "$pythonVersion" = "python3" ]; then
       echo "Running python3"
-      /opt/microsoft/dsc/Scripts/python3/InstallModule.py /opt/microsoft/dsc/module_packages/nx_1.1.zip 0
+      /opt/microsoft/dsc/Scripts/python3/InstallModule.py /opt/microsoft/dsc/module_packages/nx_1.5.zip 0
     else
       echo "Running python2 in Check if DIY DSC install... python version is ", $pythonVersion
-      /opt/microsoft/dsc/Scripts/InstallModule.py /opt/microsoft/dsc/module_packages/nx_1.1.zip 0
+      /opt/microsoft/dsc/Scripts/InstallModule.py /opt/microsoft/dsc/module_packages/nx_1.5.zip 0
     fi
   fi
 fi
@@ -427,23 +466,27 @@ if [ -d "/etc/opt/omi/conf/omsconfig" ]; then chown -R omsagent:omiusers /etc/op
 #else
 
 # pythonVersion check must be repeated for each section
-if  [ ! "$(python2 --version 2>&1 | grep 'not found')" ]; then
-  echo "Using python2"
-  pythonVersion="python2"
-elif [ ! "$(python3 --version 2>&1 | grep 'not found')" ]; then
+version=$(python3 -V 2>&1 | grep -Po '(?<=Python )(.+)')
+if [ ! -z "$version" ]; then
   echo "Using python3"
   pythonVersion="python3"
 else
-  echo "Python not found."
+  version=$(python2 -V 2>&1 | grep -Po '(?<=Python )(.+)')
+  if [ ! -z "$version" ]; then
+    echo "Using python2"
+    pythonVersion="python2"
+  else
+    echo "Python not found."
+  fi
 fi
 
 # Set up built-in resource module for DIY DSC
 if [ "$pythonVersion" = "python3" ]; then
   echo "Running python3"
-	/opt/microsoft/dsc/Scripts/python3/InstallModule.py /opt/microsoft/dsc/module_packages/nx_1.1.zip 0
+	/opt/microsoft/dsc/Scripts/python3/InstallModule.py /opt/microsoft/dsc/module_packages/nx_1.5.zip 0
 else
   echo "Running python2 in set up built in python version is ", $pythonVersion
-	/opt/microsoft/dsc/Scripts/InstallModule.py /opt/microsoft/dsc/module_packages/nx_1.1.zip 0
+	/opt/microsoft/dsc/Scripts/InstallModule.py /opt/microsoft/dsc/module_packages/nx_1.5.zip 0
 fi
 
 
@@ -486,6 +529,10 @@ ln -fs $LIBCURL_SO /opt/omi/lib/libcurl.so.4
 
 #if BUILD_OMS == 1
 chown -R omsagent /opt/microsoft/${{SHORT_NAME}}/Scripts
+
+# Reset Script dir ownership back to root
+chown root /opt/microsoft/${{SHORT_NAME}}/Scripts
+
 su - omsagent -c "/opt/microsoft/${{SHORT_NAME}}/Scripts/ImportGPGKey.sh /opt/microsoft/${{SHORT_NAME}}/keys/msgpgkey.asc keymgmtring.gpg"
 su - omsagent -c "/opt/microsoft/${{SHORT_NAME}}/Scripts/ImportGPGKey.sh /opt/microsoft/${{SHORT_NAME}}/keys/dscgpgkey.asc keyring.gpg"
 
@@ -500,6 +547,8 @@ chown root:root /opt/microsoft/${{SHORT_NAME}}/Scripts/OMSServiceStatAll.sh
 chown root:root /opt/microsoft/${{SHORT_NAME}}/Scripts/OMSYumUpdates.sh
 chown root:root /opt/microsoft/${{SHORT_NAME}}/Scripts/OMSZypperUpdates.sh
 chown root:root /opt/microsoft/${{SHORT_NAME}}/Scripts/OMSAptUpdates.sh
+chown root:root /opt/microsoft/${{SHORT_NAME}}/Scripts/OMSYumSecurityUpdates.sh
+chown root:root /opt/microsoft/${{SHORT_NAME}}/Scripts/OMSZypperSecurityUpdates.sh
 chown root:root /opt/microsoft/${{SHORT_NAME}}/Scripts/OMSAuditdPlugin.sh
 # Reset file ownership at /opt/microsoft/omsagent/plugin 
 chown root:root /opt/microsoft/omsagent/plugin/tailfilereader.rb
@@ -528,14 +577,18 @@ mv /etc/crontabtmp /etc/crontab
 #if BUILD_OMS == 1
 
 # pythonVersion check must be repeated for each section
-if  [ ! "$(python2 --version 2>&1 | grep 'not found')" ]; then
-  echo "Using python2"
-  pythonVersion="python2"
-elif [ ! "$(python3 --version 2>&1 | grep 'not found')" ]; then
+version=$(python3 -V 2>&1 | grep -Po '(?<=Python )(.+)')
+if [ ! -z "$version" ]; then
   echo "Using python3"
   pythonVersion="python3"
 else
-  echo "Python not found"
+  version=$(python2 -V 2>&1 | grep -Po '(?<=Python )(.+)')
+  if [ ! -z "$version" ]; then
+    echo "Using python2"
+    pythonVersion="python2"
+  else
+    echo "Python not found."
+  fi
 fi
 
 # If omsadmin.conf exists, let's apply the metaconfig
@@ -559,23 +612,33 @@ chgrp omsagent /etc/opt/omi/conf/omsconfig/configuration/Inventory.mof
 echo "Cleanning up existing dsc_hosts before uninstall..."
 kill $(ps -eo pid,cmd | grep '/opt/dsc/bin/dsc_host' | grep -v grep | tr -s ' ' | sed 's/^[ \t]*//' | cut -d' ' -f1) -9 2&>1 > /dev/null
 chmod -R 777 /opt/dsc
-rm -rfv /opt/dsc
+# remove entire dsc folder incase of remove and purge
+echo "Deployment operation type :" $1 
+if [ "$1" = "0" -o "$1" = 0 -o "$1" = "remove" -o "$1" = "purge" ]; then
+    echo "Cleanning directory /opt/dsc..."
+    rm -rfv /opt/dsc
+fi
 rm -f /etc/opt/omi/conf/omsconfig/inventory_lock
 echo "Cleaned up existing dsc_hosts before uninstall..."
 
 %Preuninstall_999
 # pythonVersion check must be repeated for each section
-if  [ ! "$(python2 --version 2>&1 | grep 'not found')" ]; then
-  echo "Using python2"
-  pythonVersion="python2"
-elif [ ! "$(python3 --version 2>&1 | grep 'not found')" ]; then
+version=$(python3 -V 2>&1 | grep -Po '(?<=Python )(.+)')
+if [ ! -z "$version" ]; then
   echo "Using python3"
   pythonVersion="python3"
 else
-  echo "Python not found"
+  version=$(python2 -V 2>&1 | grep -Po '(?<=Python )(.+)')
+  if [ ! -z "$version" ]; then
+    echo "Using python2"
+    pythonVersion="python2"
+  else
+    echo "Python not found."
+  fi
 fi
 # if this is a package removal, not an upgrade, remove the modules
-if [ "$1" = "0" -o "$1" = "remove" -o "$1" = "purge" ]; then
+echo "Deployment operation type :" $1 
+if [ "$1" = "0" -o "$1" = 0 -o "$1" = "remove" -o "$1" = "purge" ]; then
   # Remove all DSC specific data
   if [ "$pythonVersion" = "python3" ]; then
      echo "Running python3"
@@ -637,6 +700,9 @@ if pidof systemd 1> /dev/null 2> /dev/null; then
     echo "Pausing briefly for systemctl synchronization ..."
     sleep 5
 fi
+
+# Remove seure_update cache
+rm -rf /var/opt/microsoft/omsconfig_secure_cache
 
 #endif
 

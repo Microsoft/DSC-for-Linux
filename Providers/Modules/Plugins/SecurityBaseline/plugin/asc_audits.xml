@@ -1,0 +1,128 @@
+<baseline BaselineId="ASC.Linux.1" BaseOrigId="1">
+  <baselines>
+    <baseline id="Common.Linux" />
+    <baseline id="CIS.Linux" />
+    <baseline id="SSH.Linux" />
+  </baselines>
+  <audits>
+    <audit
+      description="Ensure logging is configured"
+      msid="60"
+      impact="A great deal of important security-related information is sent via `rsyslog` (for example, successful and failed su attempts, failed login attempts, root login attempts, etc.)."
+      remediation="Configure syslog, rsyslog or syslog-ng as appropriate"
+      ruleId="15ca11bf-034a-56d6-564f-2f857d1f96c6">
+      <check distro="*" command="CheckFileExistsRegex" path="/var/log" regex="(syslog|\S+\.log$)"/>
+    </audit>
+    <audit
+      description="Ensure logger configuration files are restricted."
+      msid="63.1"
+      impact="It is important to ensure that log files exist and have the correct permissions to ensure that sensitive syslog data is archived and protected."
+      remediation="Set your logger's configuration files to 0640  or run '/opt/microsoft/omsagent/plugin/omsremediate -r logger-config-file-permissions'"
+      ruleId="afd57de2-4365-9949-79f7-f8e92c198746">
+      <check distro="*" command="CheckFileStatsIfExists" path="/etc/syslog-ng/syslog-ng.conf" mode="644"/>
+      <check distro="*" command="CheckFileStatsIfExists" path="/etc/rsyslog.conf" mode="644"/>
+    </audit>
+    <audit
+      description="Ensure at/cron is restricted to authorized users"
+      msid="98"
+      impact="On many systems, only the system administrator is authorized to schedule `cron` jobs. Using the `cron.allow` file to control who can run `cron` jobs enforces this policy. It is easier to manage an allowlist than a denylist. In a denylist, you could potentially add a user ID to the system and forget to add it to the deny files."
+      remediation="Replace /etc/cron.deny and /etc/at.deny with their respective `allow` files or run '/opt/microsoft/omsagent/plugin/omsremediate -r fix-cron-job-allow'"
+      ruleId="7ac5f3c8-917b-548e-3138-c6e326a362fc">
+      <check distro="*" command="CheckFileNotExists" path="/etc/cron.deny"/>
+      <check distro="*" command="CheckFileNotExists" path="/etc/at.deny"/>
+      <check distro="*" command="CheckFileStats" path="/etc/cron.allow" user="root" group="root" mode="600" allow-stricter="true"/>
+      <check distro="*" command="CheckFileStats" path="/etc/at.allow" user="root" group="root" mode="600" allow-stricter="true">
+        <dependency type="PackageInstalled">at</dependency>
+      </check>
+    </audit>
+
+    <audit
+      description="Ensure remote login warning banner is configured properly."
+      msid="111"
+      impact="Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organization that owns the system and any monitoring policies that are in place. Displaying OS and patch level information in login banners also has the side effect of providing detailed system information to attackers attempting to target specific exploits of a system. Authorized users can easily get this information by running the `uname -a`command once they have logged in."
+      remediation="Remove any instances of \m \r \s and \v from the /etc/issue.net file"
+      ruleId="d8bba1aa-69e9-2caf-1632-72938ff6759a">
+      <check distro="*" command="CheckNoMatchingLinesIfExists" path="/etc/issue.net" regex="\\m|\\r|\\s|\\v"/>
+    </audit>
+
+    <audit
+      description="Ensure local login warning banner is configured properly."
+      msid="111.1"
+      impact="Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organization that owns the system and any monitoring policies that are in place. Displaying OS and patch level information in login banners also has the side effect of providing detailed system information to attackers attempting to target specific exploits of a system. Authorized users can easily get this information by running the `uname -a`command once they have logged in."
+      remediation="Remove any instances of \m \r \s and \v from the /etc/issue file"
+      ruleId="14c168de-4508-a69d-0feb-2f1efe245a71">
+      <check distro="*" command="CheckNoMatchingLinesIfExists" path="/etc/issue" regex="\\m|\\r|\\s|\\v"/>
+    </audit>
+
+    <audit
+      description="Ensure auditd service is enabled"
+      msid="162"
+      cceid="CCE-4240-2"
+      severity="Critical"
+      impact="The capturing of system events provides system administrators with information to allow them to determine if unauthorized access to their system is occurring."
+      remediation="Install audit package (systemctl enable auditd)"
+      ruleId="f9fd03d2-75e4-4564-84a9-4e955f1e7c30">
+      <check distro="*" command="CheckServiceEnabled" service="auditd">
+        <dependency type="PackageInstalled">audit(?:d)?$</dependency>
+      </check>
+    </audit>
+
+    <audit
+      description="Run AuditD service"
+      msid="163"
+      cceid=" CCE-4240-3"
+      severity="Critical"
+      impact="The capturing of system events provides system administrators with information to allow them to determine if unauthorized access to their system is occurring."
+      remediation="Run AuditD service (systemctl start auditd)"
+      ruleId="c146c4a4-5eb6-4205-88da-5a71a82f2d45">
+      <check distro="*" command="CheckServiceEnabled"  expect="running" service="auditd">
+      <dependency type="PackageInstalled">audit(?:d)?$</dependency>
+      </check>
+    </audit>
+  </audits>
+  <remediations>
+  <!--
+    Remediations are preformed in the order they appear in this file.
+    All actions in a remediation that match the distro are performed, and in the order they appear.
+  -->
+
+    <remediation id="bootloader-permissions" msids="31.1" description="Ensure permissions on bootloader config are set">
+      <action distro="*" action="ActionSetPerms" path="/boot/grub/grub.conf" name="root:root" value="0400"/>
+      <action distro="*" action="ActionSetPerms" path="/boot/grub/grub.cfg" name="root:root" value="0400"/>
+      <action distro="*" action="ActionSetPerms" path="/boot/grub2/grub.cfg" name="root:root" value="0400"/>
+    </remediation>
+
+    <remediation id="logger-config-file-permissions" msids="63.1" description="Set the permissions of logger config files">
+      <action distro="*" action="ActionSetPerms" path="/etc/syslog-ng/syslog-ng.conf" value="0644"/>
+      <action distro="*" action="ActionSetPerms" path="/etc/rsyslog.conf" value="0644"/>
+    </remediation>
+
+    <remediation id="fix-cron-job-allow" msids="98" description="Delete /etc/cron.deny and /etc/at.deny. Create /etc/cron.allow and /etc/at.allow.">
+      <action distro="*" action="ActionScript">
+        <script>
+        <![CDATA[
+if [ -f /etc/cron.deny ]; then
+        echo "/etc/cron.deny file exists"
+
+        if rm -f /etc/cron.deny; then
+                echo "Deleted /etc/cron.deny"
+        fi
+fi
+if [ -f /etc/at.deny ]; then
+        echo "/etc/at.deny file exists"
+        if rm -f /etc/at.deny; then
+                echo "Deleted /etc/at.deny"
+        fi
+fi
+touch /etc/cron.allow
+touch /etc/at.allow
+chown root:root /etc/cron.allow
+chown root:root /etc/at.allow
+chmod 600 /etc/cron.allow
+chmod 600 /etc/at.allow
+        ]]>
+        </script>
+      </action>
+    </remediation>
+  </remediations>
+</baseline>

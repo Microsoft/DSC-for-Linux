@@ -99,7 +99,7 @@ class Sandbox:
 
         # clean up finished jobs
         for job_id, job_tuple in list(job_map.items()):
-            if job_tuple[0].isAlive() is False:
+            if job_tuple[0].is_alive() is False:
                 try:
                     job_tuple[2].get(block=False)
                     raise SandboxRuntimeException()

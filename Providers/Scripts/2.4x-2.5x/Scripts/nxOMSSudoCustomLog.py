@@ -125,22 +125,22 @@ def Test(EnableCustomLogConfiguration, Ensure, CustomLogObjects):
             return [0]
         elif CurrentCustomLogObjects is None or CustomLogObjects is None:
             return [-1]
-        
-        CustomLogObjects.sort()
+
+        CustomLogObjects = sorted(CustomLogObjects, key = lambda d : d['LogName'])
         for customlog in CustomLogObjects:
             customlog['FilePath'].sort()
 
-        CurrentCustomLogObjects.sort()
+        CurrentCustomLogObjects = sorted(CurrentCustomLogObjects, key = lambda d : d['LogName'])
         for customlog in CurrentCustomLogObjects:
             customlog['FilePath'].sort()
 
         if CustomLogObjects != CurrentCustomLogObjects:
             return [-1]
-       
+
         if Ensure == "Absent":
             return [-1]
-        
-    return [0] 
+
+    return [0]
 
 def Get(EnableCustomLogConfiguration, Ensure, CustomLogObjects):
     CurrentCustomLogObjects = ReadConf()

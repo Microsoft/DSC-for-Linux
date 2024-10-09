@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 # Standard library imports
 from subprocess           import Popen, PIPE

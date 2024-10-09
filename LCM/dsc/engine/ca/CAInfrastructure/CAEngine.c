@@ -81,8 +81,17 @@ MI_Result AddToResourceErrorList(ResourceErrorList * resourceErrorList, const ch
         resourceErrorList->last = current;
     }
 
+    if(current == NULL) {
+        return MI_RESULT_FAILED;
+    }
+
     current->next = NULL;
     current->resourceID = (char *)calloc(length + 1, sizeof(char));
+    
+    if(current->resourceID = NULL) {
+        free(current);
+        return MI_RESULT_FAILED;
+    }
     strncpy(current->resourceID, resourceID, length);
     return MI_RESULT_OK;
 }
@@ -102,6 +111,9 @@ char * BuildStringResourceErrorList(ResourceErrorList * resourceErrorList)
     }
 
     outstring = (char *) calloc(1, sizeof(char));
+    if(outstring == NULL) {
+        return NULL;
+    }
     current_length = 0;
     current = resourceErrorList->first;
 
@@ -115,14 +127,24 @@ char * BuildStringResourceErrorList(ResourceErrorList * resourceErrorList)
         added_length = strlen(current->resourceID);
         if (current->next != NULL)
         {
-            outstring = (char *) realloc(outstring, current_length + added_length + separator_length + 1);
+            char* temp = (char *) realloc(outstring, current_length + added_length + separator_length + 1);
+
+            if(NULL == temp) {
+                free(outstring);
+            }
+            outstring = temp;
             strncpy(outstring + current_length, current->resourceID, added_length);
             strncpy(outstring + current_length + added_length, separator, separator_length);
             current_length += added_length + separator_length;
         }
         else
         {
-            outstring = (char *) realloc(outstring, current_length + added_length + 1);
+            char* temp = (char *) realloc(outstring, current_length + added_length + 1);
+
+            if(NULL == temp) {
+                free(outstring);
+            }
+            outstring = temp;
             strncpy(outstring + current_length, current->resourceID, added_length);
             current_length += added_length;
         }
@@ -421,6 +443,9 @@ MI_Result ResolveDependencyInternal( _In_ MI_Uint32 index,
                 const MI_Char* resourceID;
                 const MI_Char* sourceInfo;
                 resourceID = GetResourceId(instanceA->data[dwIndex]);
+                if(resourceID == NULL) {
+                    return MI_RESULT_NOT_FOUND;
+                }
                 sourceInfo = GetSourceInfo(instanceA->data[dwIndex]);
                 if(sourceInfo == NULL)
                 {
@@ -485,6 +510,9 @@ MI_Result GetInstanceIndex(_In_ MI_InstanceA *instanceA,
     }
     // If here resource was not found. Throw an error.
     currentResourceID = GetResourceId(instanceA->data[currentInstanceIndex]);
+    if(currentResourceID == NULL) {
+        return MI_RESULT_NOT_FOUND;
+    }
     currentSourceInfo = GetSourceInfo(instanceA->data[currentInstanceIndex]);
     if(currentSourceInfo == NULL)
     {
@@ -1782,7 +1810,7 @@ MI_Result GetSetMethodResult(_In_ MI_Operation *operation,
     MI_Result innerR = MI_RESULT_OK;
     const MI_Instance* outInstance;
     MI_Boolean moreResults;
-    MI_Result result;
+    MI_Result result = MI_RESULT_INVALID_PARAMETER;
     const MI_Char *errorMessage;
     const MI_Instance *completionDetails = NULL;
     MI_Value value;
@@ -1839,7 +1867,7 @@ MI_Result GetTestMethodResult(_In_ MI_Operation *operation,
     MI_Result innerR = MI_RESULT_OK;
     const MI_Instance* outInstance;
     MI_Boolean moreResults;
-    MI_Result result;
+    MI_Result result = MI_RESULT_INVALID_PARAMETER;
     const MI_Char *errorMessage;
     const MI_Instance *completionDetails = NULL;
     MI_Value value;
@@ -1899,7 +1927,7 @@ MI_Result GetGetMethodResult(_In_ MI_Operation *operation,
     MI_Result innerR = MI_RESULT_OK;
     const MI_Instance* outInstance;
     MI_Boolean moreResults;
-    MI_Result result;
+    MI_Result result = MI_RESULT_INVALID_PARAMETER;
     const MI_Char *errorMessage;
     const MI_Instance *completionDetails = NULL;
     MI_Value value;
@@ -2080,7 +2108,7 @@ MI_Result PerformInventoryMethodResult(_In_ MI_Operation *operation,
     MI_Instance * tempInstance;
     MI_Instance ** outInstanceArray;
     MI_Boolean moreResults;
-    MI_Result result;
+    MI_Result result = MI_RESULT_INVALID_PARAMETER;
     const MI_Char *errorMessage;
     const MI_Instance *completionDetails = NULL;
     MI_Value value;
@@ -2410,6 +2438,13 @@ MI_Result MI_CALL Do_Register(
         requestBody = RunCommand(buffer);
         snprintf(buffer, c_bufferSize, headerFormatString, DSC_SCRIPT_PATH, s_ManagerInstanceNames[typeOfManagerInstance], val.string);
         header = RunCommand(buffer);
+    }
+    if(requestBody == NULL) {
+        return MI_RESULT_FAILED;
+    }
+    if(header == NULL) {
+        DSC_free(requestBody);
+        return MI_RESULT_FAILED;
     }
 
     x_ms_header = strtok_r(header, "\n", &saveptr);

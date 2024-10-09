@@ -30,13 +30,24 @@ int main(int argc, char *argv[])
     char * pythonCommand = PYTHON2_COMMAND;
 
     char* dscScriptPath = malloc(strlen(DSC_SCRIPT_PATH) + 1);
+    if(dscScriptPath == NULL) {
+        return 0;
+    }
     dscScriptPath = strcpy(dscScriptPath, DSC_SCRIPT_PATH);
 
     pythonCommand = getPythonProvider();
+    if(pythonCommand == NULL) {
+        return 0;
+    }
 
     if(strcmp(pythonCommand, PYTHON3_COMMAND) == 0)
     {
-        dscScriptPath = realloc(dscScriptPath, strlen(dscScriptPath) + strlen("/python3") + 1 );
+        char* tempDscScriptPath = realloc(dscScriptPath, strlen(dscScriptPath) + strlen("/python3") + 1 );
+
+        if(NULL == tempDscScriptPath) {
+            free(dscScriptPath);
+        }
+        dscScriptPath = tempDscScriptPath;
         dscScriptPath = strcat(dscScriptPath, "/python3");
     }
     
@@ -50,6 +61,7 @@ int main(int argc, char *argv[])
     strcat(fullCommand, PYTHON_SCRIPT_NAME);
 
     int returnValue = system(fullCommand);
+    free(dscScriptPath);
     return returnValue;
 }
 
@@ -59,39 +71,56 @@ char* getPythonProvider()
     int buffer_length = 128;
     char buffer[buffer_length]; 
     char* result = malloc(1);
+    if(result == NULL) {
+        printf("Not enough memory to execute command.");
+        return NULL;
+    }
     *result = 0; 
 
-    FILE* pipe = popen("python2 --version 2>&1", "r");   
+    FILE* pipe = popen("python3 -V 2>&1 | grep -Po '(?<=Python )(.+)'", "r");   
     if(!pipe) {
         printf("Cant start command.");
     }
     while(fgets(buffer, 128, pipe) != NULL) {
-        result = realloc(result, (result ? strlen(result) : 0) + buffer_length );
+        char* tempResult = realloc(result, (result ? strlen(result) : 0) + buffer_length );
+
+        if(NULL == tempResult) {
+            free(result);
+        }
+        result = tempResult;
         strcat(result,buffer);
     }
 
-    // If python2 --version does not contain 'not found' return python2
-    if(strstr(result, "not found") == NULL) {
-    	return PYTHON2_COMMAND;
+    // If python3 --version exists
+    if(*result != '\0' && result[0] == '3') {
+    	return PYTHON3_COMMAND;
     }
 
-    // Look for python3
+    // Look for python2
     result = malloc(1);
+    if(result == NULL) {
+        printf("Not enough memory to execute command.");
+        return NULL;
+    }
     *result = 0;
-    pipe = popen("python3 --version 2>&1", "r");
+    pipe = popen("python2 -V 2>&1 | grep -Po '(?<=Python )(.+)'", "r");
     if(!pipe) {
     	printf("Cant start command.");
     }
     while(fgets(buffer, 128, pipe) != NULL) {
-        result = realloc(result, (result ? strlen(result) : 0) + buffer_length );
+        char* tempResult = realloc(result, (result ? strlen(result) : 0) + buffer_length );
+
+        if(NULL == tempResult) {
+            free(result);
+        }
+        result = tempResult;
         strcat(result,buffer);
     }
 
-    // If python3 --version does not contain 'not found' return python3
-    if(strstr(result, "not found") == NULL) {
-	    return PYTHON3_COMMAND;
+    // If python2 --version exists
+    if(*result != '\0' && result[0] == '2') {
+	    return PYTHON2_COMMAND;
     }
 
     return PYTHON_COMMAND;
-
 }

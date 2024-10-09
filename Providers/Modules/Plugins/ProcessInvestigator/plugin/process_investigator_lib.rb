@@ -5,7 +5,7 @@ require 'socket'
 module OMS
     class ProcessInvestigator
 
-        @@PIVersion = "1.21.1110.0004"
+        @@PIVersion = "1.21.0621.0001"
 
         # The limit for event hub messages is 256k, assuming utf16, that's 128k characters.
         # Leaving some room for overhead, truncate at 100k characters.

@@ -169,7 +169,7 @@ def write_values(fd, d):
     trace('</write_values>')
 
 
-class file_desc:
+class File_desc:
     def sendall(self, buf):
         pass
 

@@ -169,10 +169,6 @@ class Python2Runtime(Runtime):
     def __init__(self, job_data, runbook):
         Runtime.__init__(self, job_data, runbook)
         self.execution_alias = "python2"
-
-        if get_default_python_interpreter_major_version() == 2:
-            self.execution_alias = "python"
-
         self.base_cmd = [self.execution_alias]
 
 
@@ -182,10 +178,6 @@ class Python3Runtime(Runtime):
     def __init__(self, job_data, runbook):
         Runtime.__init__(self, job_data, runbook)
         self.execution_alias = "python3"
-
-        if get_default_python_interpreter_major_version() == 3:
-            self.execution_alias = "python3"
-
         self.base_cmd = [self.execution_alias]
 
 
@@ -206,19 +198,3 @@ class PowerShell7Runtime(Runtime):
 
         self.execution_alias = "pwsh"
         self.base_cmd = [self.execution_alias, "-command"]
-
-
-def get_default_python_interpreter_major_version():
-    """Return the default "python" alias interpreter version.
-
-    Returns:
-        int, the interpreter major version
-        None, if the default interpreter version cannot be detected
-    """
-    cmd = ["python3", "-c", "import sys;print(sys.version[0])"]  # need to use print() for python3 compatibility
-    p = subprocessfactory.create_subprocess(cmd=cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    default_interpreter_version, error = p.communicate()
-    if p.returncode == 0:
-        return int(default_interpreter_version.decode().strip())
-    else:
-        return None

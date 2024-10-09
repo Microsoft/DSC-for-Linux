@@ -294,7 +294,7 @@ class ZipInfo (object):
         # compress_size         Size of the compressed file
         # file_size             Size of the uncompressed file
 
-    def FileHeader(self):
+    def fileHeader(self):
         """Return the per-file header as a string."""
         dt = self.date_time
         dosdate = (dt[0] - 1980) << 9 | dt[1] << 5 | dt[2]
@@ -1036,7 +1036,7 @@ class ZipFile:
             zinfo.CRC = 0
             self.filelist.append(zinfo)
             self.NameToInfo[zinfo.filename] = zinfo
-            self.fp.write(zinfo.FileHeader())
+            self.fp.write(zinfo.fileHeader())
             return
 
         fp = open(filename, "rb")
@@ -1044,7 +1044,7 @@ class ZipFile:
         zinfo.CRC = CRC = 0
         zinfo.compress_size = compress_size = 0
         zinfo.file_size = file_size = 0
-        self.fp.write(zinfo.FileHeader())
+        self.fp.write(zinfo.fileHeader())
         if zinfo.compress_type == ZIP_DEFLATED:
             cmpr = zlib.compressobj(zlib.Z_DEFAULT_COMPRESSION,
                  zlib.DEFLATED, -15)
@@ -1108,7 +1108,7 @@ class ZipFile:
         else:
             zinfo.compress_size = zinfo.file_size
         zinfo.header_offset = self.fp.tell()    # Start of header bytes
-        self.fp.write(zinfo.FileHeader())
+        self.fp.write(zinfo.fileHeader())
         self.fp.write(bytes)
         self.fp.flush()
         if zinfo.flag_bits & 0x08:

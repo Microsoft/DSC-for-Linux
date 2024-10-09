@@ -73,7 +73,7 @@ def assert_file_read_permission(file_path):
 def get_python_to_be_used():
         import sys
         python_version = int(sys.version[0])
-        python_to_be_used = "python"
+        python_to_be_used = "python2"
         if python_version == 3:
             python_to_be_used = "python3"
         return python_to_be_used

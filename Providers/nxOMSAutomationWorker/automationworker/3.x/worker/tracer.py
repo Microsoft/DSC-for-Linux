@@ -343,6 +343,17 @@ def log_worker_safe_loop_terminal_exception(exception):
     trace_generic_hybrid_worker_event_async(5109, inspect.stack()[0][3], message, 1, KEYWORD_ERROR)
 
 
+def log_worker_certificate_rotation_successful():
+    message = "Hybrid worker Certificate rotation completed."
+    trace_generic_hybrid_worker_event_async(5110, inspect.stack()[0][3], message, 1, KEYWORD_INFO)
+
+
+def log_worker_certificate_rotation_failed(exception):
+    message = "Hybrid worker Certificate rotation failed. [exception=" + \
+               str(exception) + "]"
+    trace_generic_hybrid_worker_event_async(5111, inspect.stack()[0][3], message, 1, KEYWORD_ERROR)
+
+
 # sandbox specific traces
 # traces in this section are mainly for the sandbox component
 #

@@ -112,7 +112,8 @@ MI_Result UpdateTask(
     while (cronFile != NULL && (read = readline(&line, &readLength, cronFile)) != -1)
     {
         retValue = TcsStrlcpy(lineToWrite, line, Tcslen(line)+1);
-		retValue = sscanf(line, MI_T("%*s %*s %*s %*s %*s %*s %s"), taskInCrontab);
+		//Assuming size will be not more than 256 which is the value of UNIT_LINE_SIZE
+		retValue = sscanf(line, MI_T("%*s %*s %*s %*s %*s %*s %256s"), taskInCrontab);
 		if (retValue == 0)
 		{
 			// Ignore the bad line that does not comply with crontab file format

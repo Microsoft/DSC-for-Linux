@@ -189,6 +189,8 @@ class Job(Thread):
         string_parameter_type = 'System.String'
         string_array_parameter_type = 'System.String[]'
         bool_parameter_type = 'System.Boolean'
+        object_parameter_type = 'System.Object'
+
 
         if self.job_data.parameters is not None and len(self.job_data.parameters) > 0:
             for parameter in self.job_data.parameters:
@@ -215,6 +217,9 @@ class Job(Thread):
                         parameter_value = ",".join(updated_list)
                         # wrap the final string array in double quotes
                         parameter_value = "\"%s\"" % parameter_value
+                    elif object_parameter_type.lower() == parameter_type.lower():
+                        # wrap object type in single quotes by default
+                        parameter_value = "\'%s\'" % parameter_value
                     parameter["Value"] = parameter_value
 
     

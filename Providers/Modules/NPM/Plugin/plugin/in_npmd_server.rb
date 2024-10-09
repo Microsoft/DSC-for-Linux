@@ -211,6 +211,8 @@ module Fluent
                 unless File.directory?(_dirname)
                     # This is setting up the npm_state directory
                     FileUtils.mkdir_p(_dirname)
+                    FileUtils.chmod "0775", _dirname
+                    FileUtils.chmod "+t", _dirname
                 end
                 if File.exists?(@location_unix_endpoint)
                     File.unlink(@location_unix_endpoint)

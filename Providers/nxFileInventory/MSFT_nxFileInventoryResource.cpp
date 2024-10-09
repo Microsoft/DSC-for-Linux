@@ -225,10 +225,20 @@ void MI_CALL MSFT_nxFileInventoryResource_Invoke_InventoryTargetResource(
 		const char * reportTemplateBase = DSC_ETC_PATH "/InventoryReports/nxFileInventory_XXXXXX";
 		
 		clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
-		MI_Application_Initialize(0,NULL,NULL, &application);
+        if(clientBuffer == NULL) {
+            return;
+        }
+		if(MI_Application_Initialize(0,NULL,NULL, &application) != MI_RESULT_OK) {
+            memset(&application, 0, sizeof(MI_Application));
+            free(clientBuffer);
+            MI_Application_Close(&application);
+            return;
+        }
+        
 		result = XmlSerializer_Create(&application, 0, "MI_XML", &serializer);
 		if (result != MI_RESULT_OK)
 		{
+            free(clientBuffer);
 		    MI_Application_Close(&application);
 		    MI_Context_PostResult (context, result);
 		    return;
@@ -243,6 +253,9 @@ void MI_CALL MSFT_nxFileInventoryResource_Invoke_InventoryTargetResource(
 			// Try again with a buffer given to us by the clientBufferNeeded field
 			clientBufferLength = clientBufferNeeded;
 			clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
+            if(clientBuffer == NULL) {
+                return;
+            }
 			result = XmlSerializer_SerializeInstance( &serializer, 0, retInstance, clientBuffer, clientBufferLength, &clientBufferNeeded);
 		    }
 		    else
@@ -263,7 +276,10 @@ void MI_CALL MSFT_nxFileInventoryResource_Invoke_InventoryTargetResource(
 		}
 		
 		{
-		    char * reportTemplate = (char*)malloc(strlen(reportTemplateBase));
+		    char * reportTemplate = (char*)malloc(strlen(reportTemplateBase) + 1);
+            if(reportTemplate == NULL) {
+                return;
+            }
 		    strcpy(reportTemplate, reportTemplateBase);
 		    int fd = mkstemp(reportTemplate);
 		    if (fd == -1)

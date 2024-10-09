@@ -69,7 +69,7 @@ class AgentService:
 
         url = "{0}/HybridV2(MachineId='{1}')".format(self.endpoint, self.machine_id)
 
-        req = requests.put(url, cert=(self.cert_path, self.cert_key_path), verify=False, headers=header,
+        req = requests.put(url, cert=(self.cert_path, self.cert_key_path), verify=True, headers=header,
                            data=json.dumps(payload))
 
         if req.status_code is not 200:
@@ -101,7 +101,7 @@ class AgentService:
 
         url = "{0}/Hybrid(MachineId='{1}')".format(self.endpoint, self.machine_id)
 
-        req = requests.delete(url, cert=(self.cert_path, self.cert_key_path), verify=False, headers=header,
+        req = requests.delete(url, cert=(self.cert_path, self.cert_key_path), verify=True, headers=header,
                               data=json.dumps(payload))
 
         if req.status_code is not 200:

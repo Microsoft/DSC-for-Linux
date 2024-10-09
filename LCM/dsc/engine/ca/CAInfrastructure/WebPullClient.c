@@ -245,6 +245,9 @@ static MI_Result GetSSLOptions(_Outptr_result_maybenull_ MI_Instance **extendedE
     if (proxyFileLocationToUse != NULL)
     {
 	text = InhaleTextFile(proxyFileLocationToUse);
+    if(text == NULL) {
+        return MI_RESULT_FAILED;
+    }
 	valueLength = strlen(text);
 	if (valueLength > MAX_SSLOPTION_STRING_LENGTH)
 	{
@@ -269,6 +272,9 @@ static size_t HeaderCallback(void *contents, size_t size, size_t nmemb, void *us
   long key_length = 0;
   long value_length = 0;
   char *charContents = (char*)calloc(realsize, 1);
+  if(charContents == NULL) {
+    return 0;
+  }
 
   // We have to do a silly memcpy here because there's no safe version of "strstr", used below.
   memcpy(charContents, contents, realsize);
@@ -292,8 +298,18 @@ static size_t HeaderCallback(void *contents, size_t size, size_t nmemb, void *us
       return realsize;
   }
 
-  chunk->headerKeys = realloc(chunk->headerKeys, (chunk->size + 1) * sizeof(char*) );
-  chunk->headerValues = realloc(chunk->headerValues, (chunk->size + 1) * sizeof(char*) );
+  char* tempHeaderKeys = realloc(chunk->headerKeys, (chunk->size + 1) * sizeof(char*) );
+  char* tempHeaderValues = realloc(chunk->headerValues, (chunk->size + 1) * sizeof(char*) );
+  if(tempHeaderKeys == NULL) {
+    free(chunk->headerKeys);
+    return 0;
+  }
+  if(tempHeaderValues == NULL) {
+    free(chunk->headerValues);
+    return 0;
+  }
+  chunk->headerKeys = tempHeaderKeys;
+  chunk->headerValues = tempHeaderValues;
 
   chunk->headerKeys[chunk->size] = malloc( key_length + 1 );
   chunk->headerValues[chunk->size] = malloc( value_length + 1);
@@ -311,9 +327,29 @@ static size_t HeaderCallback(void *contents, size_t size, size_t nmemb, void *us
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
   size_t realsize = size * nmemb;
+  //Handle size overflow due to multiplication
+  if( nmemb != 0 && (realsize / nmemb != size || (realsize % nmemb) != 0)) {
+    return 0;
+  }
+  size_t reallocationSize = realsize;
+  //Handle size overflow due to addition
+  if(reallocationSize + 1 < reallocationSize) {
+    return 0;
+  }
+  reallocationSize = reallocationSize + 1;
   struct Chunk *mem = (struct Chunk *)userp;
+  //Handle size overflow due to addition
+  if(reallocationSize + mem->size < reallocationSize || reallocationSize + mem->size < mem->size) {
+    return 0;
+  }
+  reallocationSize = reallocationSize + mem->size;
 
-  mem->data = realloc(mem->data, mem->size + realsize + 1);
+  char* tempMemData = (char *)realloc(mem->data, reallocationSize);
+  if(tempMemData == NULL) {
+    free(mem->data);
+    return 0;
+  }
+  mem->data = tempMemData;
   memcpy(&(mem->data[mem->size]), contents, realsize);
   mem->size += realsize;
   mem->data[mem->size] = 0;
@@ -2076,24 +2112,21 @@ MI_Result MI_CALL Pull_GetModules(_Out_ MI_Uint32 * numModulesInstalled,
         int isPython2 = 1;
         DSC_LOG_INFO("Assuming python2 in WebPullClient\n");
 
-	// Look for python2
-        FILE * pipe = popen("python2 --version 2>&1", "r");
+	    // Look for python3
+        FILE * pipe = popen("python3 -V 2>&1 | grep -Po '(?<=Python )(.+)'", "r");
         fgets(data, BUFSIZ, pipe);
-        if (!strstr(data, "not found"))
-        {
-            DSC_LOG_INFO("Found python2 in WebPullClient.\n");
-                isPython2 = 1;
-            }
-        else
-        {
-            // If python2 does not exist, look for python3
+        if (data[0] == '3') {
+            DSC_LOG_INFO("Found python3 in WebPullClient.\n");
+            isPython2 = 0;
+        } else {
+            // If python3 does not exist, look for python2
             memset(&data[0], 0, sizeof(data));
-                pipe = popen("python3 --version 2>&1", "r");
-                fgets(data, BUFSIZ, pipe);
-            if (!strstr(data, "not found")) {
-                DSC_LOG_INFO("Found python3 in WebPullClient.\n");
-                    isPython2 = 0;
-                }
+            pipe = popen("python2 -V 2>&1 | grep -Po '(?<=Python )(.+)'", "r");
+            fgets(data, BUFSIZ, pipe);
+            if (data[0] == '2') {
+                DSC_LOG_INFO("Found python2 in WebPullClient.\n");
+                    isPython2 = 1;
+            }
         }
 
       	if (isPython2 == 1)
@@ -2540,6 +2573,9 @@ static MI_Result GetModuleNameVersionTable(MI_Char* mofFileLocation,
 
                 // foundEntry will be a pointer to the "next" or "first" pointer that points to the ModuleTableEntry we want
                 foundEntry = ModuleTableContainsKey(table, moduleName.string);
+                if(foundEntry == NULL) {
+                    return MI_RESULT_FAILED;
+                }
                 if ( *foundEntry != NULL )
                 {
                     // Find VersionClass tuple, append new class if necessary, update version if necessary
@@ -2857,6 +2893,9 @@ MI_Result MI_CALL Pull_SendStatusReport(_In_ LCMProviderContext *lcmContext,
         }
 
         reportText = RunCommand(dataBuffer);
+        if(reportText == NULL) {
+            return MI_RESULT_FAILED;
+        }
 
         curl = curl_easy_init();
         if (!curl)

@@ -195,10 +195,7 @@ int File_CopyT(_In_z_ const PAL_Char* src, _In_z_ const PAL_Char* dest)
 #ifndef CONFIG_ENABLE_WCHAR
 
     /* Unlink output file if it exists */
-    if (access(dest, F_OK) == 0)
-    {
-        unlink(dest);
-    }
+    remove(dest);
 #endif
 #endif
 

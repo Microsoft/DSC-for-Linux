@@ -58,8 +58,8 @@ DEFAULT_UNKNOWN = "Unknown"
 DEFAULT_VM_ID = DEFAULT_UNKNOWN
 DEFAULT_WORKER_TYPE = DEFAULT_UNKNOWN
 DEFAULT_COMPONENT = DEFAULT_UNKNOWN
-DEFAULT_WORKER_VERSION = "1.7.5.0"
-DEFAULT_JRDS_POLLING_FREQUENCY = "15"
+DEFAULT_WORKER_VERSION = "1.10.0.0"
+DEFAULT_JRDS_POLLING_FREQUENCY = "30"
 
 # state configuration keys
 STATE_PID = "pid"
@@ -184,10 +184,6 @@ def get_value(key):
         return json.loads(os.environ[CONFIG_ENV_KEY])[key]
     except KeyError:
         raise KeyError("Configuration environment variable not found. [key=" + key + "].")
-
-
-def get_jrds_get_sandbox_actions_polling_freq():
-    return get_value(JRDS_POLLING_FREQUENCY)
 
 
 def get_jrds_get_job_actions_polling_freq():

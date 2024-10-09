@@ -6,13 +6,18 @@
 
 from datetime import datetime
 import time
+import traceback
 
 
 import configuration
 import locallogger
+import linuxutil
+import workercertificaterotation
 from workerexception import *
 
 transient_status_codes = set([408, 429, 500, 502, 503, 504])
+
+DISABLE_CERT_ROTATION = 'False'
 
 class JRDSClient:
     def __init__(self, http_client):
@@ -45,7 +50,7 @@ class JRDSClient:
         return response
 
     def get_sandbox_actions(self):
-        """Gets any pending sandbox actions.
+        """Gets any pending sandbox actions and headers which determine polling frequency and certificate rotation of workers
 
         Returns:
             A list of sandbox actions.
@@ -68,6 +73,8 @@ class JRDSClient:
               "&api-version=" + self.protocol_version
         response = self.issue_request(lambda u: self.httpClient.get(u), url)
 
+        import tracer
+
         if response.status_code == 200:
             try:
                 if response.deserialized_data is None or "value" not in response.deserialized_data:
@@ -78,9 +85,58 @@ class JRDSClient:
                 return None
 
             # success path
+
+            # whenever worker cert has crossed half of it's lifetime or server is initiating a forced rotation of certificate based on date, header is set on the server side
+            # based on the headers client initiates worker certificate rotation
+
+            try:
+                if eval(workercertificaterotation.get_certificate_rotation_header_value()):
+                    tracer.log_debug_trace("Initiating certificate rotation of Hybrid Worker")
+                    workercertificaterotation.set_certificate_rotation_header_value(DISABLE_CERT_ROTATION)
+                    self.worker_certificate_rotation()
+                    tracer.log_worker_certificate_rotation_successful()
+            except Exception as ex:
+                tracer.log_worker_certificate_rotation_failed(ex)
+                tracer.log_debug_trace("[exception=" + str(ex) + "]")
+
             return response.deserialized_data["value"]
 
         raise Exception("Unable to get sandbox actions. [status=" + str(response.status_code) + "]")
+
+
+    def worker_certificate_rotation(self):
+        """ Rotate worker certificate. 
+            Steps includes creating new certificate/key and after JRDS returns 200, replace the old certificate/key with newly generated certificate/key.
+            Worker.conf is updated with the latest thumbprint.
+        """
+
+        import tracer
+
+        try:
+            temp_certificate_path, temp_key_path = workercertificaterotation.generate_cert_rotation_self_signed_certificate()
+            issuer, subject, thumbprint, not_before, not_after = linuxutil.get_cert_info_with_dates(temp_certificate_path)
+
+            payload = {'Thumbprint': thumbprint,
+               'Issuer': issuer,
+               'Subject': subject,
+               'NotBefore': not_before,
+               'NotAfter': not_after}
+
+            headers = {"Content-Type": "application/json"}
+
+            url = self.base_uri + "/automationAccounts/" + self.account_id + \
+              "/hybridCertificateRotation?api-version=" + self.protocol_version
+            response = self.issue_request(lambda u: self.httpClient.post(u, headers=headers, data=payload), url)
+
+            if response.status_code == 200:
+                tracer.log_debug_trace("New worker certificate successfully added in the Database")
+                workercertificaterotation.replace_self_signed_certificate_and_key(temp_certificate_path, temp_key_path, thumbprint)
+        except Exception as ex:
+            tracer.log_debug_trace("[exception=" + str(ex) + "]" + "[stacktrace=" + str(traceback.format_exc()) + "]")
+            tracer.log_worker_certificate_rotation_failed(ex)
+        finally:
+            workercertificaterotation.clean_up_certificate_and_key(temp_certificate_path, temp_key_path)
+            return
 
     def get_job_actions(self, sandbox_id):
         """Gets any pending job action for the given sandbox id.
